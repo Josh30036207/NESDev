@@ -8,6 +8,7 @@
 #define WHITE 0x30
 #define BLUE 0x0C
 #define BROWN 0x07
+#define PINK 0x25
 // there's some oddities in the palette code, black must be 0x0f, white must be 0x30
  
  
@@ -26,6 +27,12 @@ unsigned char pad1;
 
 const unsigned char text[]="You truly are the dark soul"; // zero terminated c string
 const unsigned char palette[]={
+BLACK, DK_GY, BLUE, PINK,
+WHITE,0,0,0,
+0,0,0,0,
+0,0,0,0
+}; 
+const unsigned char palette2[]={
 BLACK, DK_GY, BLUE, BROWN,
 WHITE,0,0,0,
 0,0,0,0,
@@ -41,7 +48,7 @@ void main (void) {
 	ppu_off(); // screen off
 
 	pal_bg(palette); //	load the BG palette
-	pal_spr(palette);//load the sprite palette
+	pal_spr(palette2);//load the sprite palette
 	bank_spr(1);
 	// set a starting point on the screen
 	// vram_adr(NTADR_A(x,y));
@@ -73,7 +80,8 @@ void main (void) {
 		oam_clear(); //Clear the sprite buffer.
 		//oam_spr(xPos,yPos,0,0); //Push 1 sprite to the buffer
 		oam_meta_spr(xPos,yPos,metasprite); //Push 1 metasprite to the buffer.
-		
+		oam_meta_spr(xPos-18,yPos+25,metasprite2);
+		oam_meta_spr(xPos+18,yPos+25,metasprite3);
 	}
 }
 	

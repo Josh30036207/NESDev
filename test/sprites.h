@@ -13,3 +13,11 @@ const unsigned char metasprite2[]={
 	  8,  8,0x11,0,
 	128
 };
+
+const unsigned char metasprite3[]={
+	  0,  0,0x00,0,
+	  0,  8,0x10,0,
+	  8,  0,0x00,0|OAM_FLIP_H,
+	  8,  8,0x10,0|OAM_FLIP_H,
+	128
+};
