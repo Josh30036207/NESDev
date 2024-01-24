@@ -6,13 +6,32 @@
 	.smart		on
 	.autoimport	on
 	.case		on
-	.debuginfo	off
+	.debuginfo	on
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
+	.dbg		file, "game.c", 1464, 1706135041
+	.dbg		file, "LIB/neslib.h", 9196, 1701627949
+	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
+	.dbg		file, "sprites.h", 809, 1706134841
+	.dbg		file, "game.h", 649, 1706134877
 	.forceimport	__STARTUP__
+	.dbg		sym, "pal_bg", "00", extern, "_pal_bg"
+	.dbg		sym, "pal_spr", "00", extern, "_pal_spr"
+	.dbg		sym, "pal_col", "00", extern, "_pal_col"
+	.dbg		sym, "ppu_wait_nmi", "00", extern, "_ppu_wait_nmi"
+	.dbg		sym, "ppu_off", "00", extern, "_ppu_off"
+	.dbg		sym, "ppu_on_all", "00", extern, "_ppu_on_all"
+	.dbg		sym, "oam_clear", "00", extern, "_oam_clear"
+	.dbg		sym, "oam_meta_spr", "00", extern, "_oam_meta_spr"
+	.dbg		sym, "pad_poll", "00", extern, "_pad_poll"
+	.dbg		sym, "bank_spr", "00", extern, "_bank_spr"
+	.dbg		sym, "vram_adr", "00", extern, "_vram_adr"
+	.dbg		sym, "vram_write", "00", extern, "_vram_write"
+	.dbg		sym, "check_collision", "00", extern, "_check_collision"
 	.import		_pal_bg
 	.import		_pal_spr
+	.import		_pal_col
 	.import		_ppu_wait_nmi
 	.import		_ppu_off
 	.import		_ppu_on_all
@@ -22,21 +41,34 @@
 	.import		_bank_spr
 	.import		_vram_adr
 	.import		_vram_write
+	.import		_check_collision
 	.export		_metasprite
 	.export		_metasprite2
-	.export		_yPos
-	.export		_xPos
+	.export		_metasprite3
+	.export		_paletteBg
+	.export		_paletteSp
 	.export		_pad1
+	.export		_collision
 	.export		_text
-	.export		_palette
+	.export		_knight
+	.export		_Enemy
+	.export		_drawSprites
+	.export		_move
+	.export		_testCollision
 	.export		_main
 
 .segment	"DATA"
 
-_yPos:
-	.byte	$40
-_xPos:
-	.byte	$88
+_knight:
+	.byte	$14
+	.byte	$14
+	.byte	$0F
+	.byte	$0F
+_Enemy:
+	.byte	$C8
+	.byte	$93
+	.byte	$0F
+	.byte	$0F
 
 .segment	"RODATA"
 
@@ -76,11 +108,43 @@ _metasprite2:
 	.byte	$11
 	.byte	$00
 	.byte	$80
-_text:
-	.byte	$59,$6F,$75,$20,$74,$72,$75,$6C,$79,$20,$61,$72,$65,$20,$74,$68
-	.byte	$65,$20,$64,$61,$72,$6B,$20,$73,$6F,$75,$6C,$00
-_palette:
+_metasprite3:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$08
+	.byte	$10
+	.byte	$00
+	.byte	$08
+	.byte	$00
+	.byte	$00
+	.byte	$40
+	.byte	$08
+	.byte	$08
+	.byte	$10
+	.byte	$40
+	.byte	$80
+_paletteBg:
 	.byte	$0F
+	.byte	$00
+	.byte	$0C
+	.byte	$25
+	.byte	$30
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+_paletteSp:
+	.byte	$25
 	.byte	$00
 	.byte	$0C
 	.byte	$07
@@ -96,12 +160,193 @@ _palette:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+_text:
+	.byte	$59,$6F,$75,$20,$74,$72,$75,$6C,$79,$20,$61,$72,$65,$20,$74,$68
+	.byte	$65,$20,$64,$61,$72,$6B,$20,$73,$6F,$75,$6C,$00
 
 .segment	"BSS"
 
-.segment	"ZEROPAGE"
 _pad1:
 	.res	1,$00
+_collision:
+	.res	1,$00
+
+; ---------------------------------------------------------------
+; void __near__ drawSprites (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_drawSprites: near
+
+	.dbg	func, "drawSprites", "00", extern, "_drawSprites"
+
+.segment	"CODE"
+
+;
+; ppu_wait_nmi(); // wait till beginning of the frame
+;
+	.dbg	line, "game.c", 57
+	jsr     _ppu_wait_nmi
+;
+; oam_clear();
+;
+	.dbg	line, "game.c", 59
+	jsr     _oam_clear
+;
+; oam_meta_spr(knight.x, knight.y, metasprite);
+;
+	.dbg	line, "game.c", 62
+	jsr     decsp2
+	lda     _knight
+	ldy     #$01
+	sta     (sp),y
+	lda     _knight+1
+	dey
+	sta     (sp),y
+	lda     #<(_metasprite)
+	ldx     #>(_metasprite)
+	jsr     _oam_meta_spr
+;
+; oam_meta_spr(Enemy.x, Enemy.y, metasprite2);
+;
+	.dbg	line, "game.c", 64
+	jsr     decsp2
+	lda     _Enemy
+	ldy     #$01
+	sta     (sp),y
+	lda     _Enemy+1
+	dey
+	sta     (sp),y
+	lda     #<(_metasprite2)
+	ldx     #>(_metasprite2)
+	jmp     _oam_meta_spr
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ move (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_move: near
+
+	.dbg	func, "move", "00", extern, "_move"
+
+.segment	"CODE"
+
+;
+; if(pad1 & PAD_LEFT){
+;
+	.dbg	line, "game.c", 42
+	lda     _pad1
+	and     #$02
+	beq     L000A
+;
+; knight.x -= 1;
+;
+	.dbg	line, "game.c", 43
+	dec     _knight
+;
+; else if (pad1 & PAD_RIGHT){
+;
+	.dbg	line, "game.c", 45
+	jmp     L000B
+L000A:	lda     _pad1
+	and     #$01
+	beq     L000B
+;
+; knight.x += 1;
+;
+	.dbg	line, "game.c", 46
+	inc     _knight
+;
+; if(pad1 & PAD_UP){
+;
+	.dbg	line, "game.c", 48
+L000B:	lda     _pad1
+	and     #$08
+	beq     L000C
+;
+; knight.y -= 1;
+;
+	.dbg	line, "game.c", 49
+	dec     _knight+1
+;
+; else if (pad1 & PAD_DOWN){
+;
+	.dbg	line, "game.c", 51
+	rts
+L000C:	lda     _pad1
+	and     #$04
+	beq     L0007
+;
+; knight.y += 1;
+;
+	.dbg	line, "game.c", 52
+	inc     _knight+1
+;
+; }
+;
+	.dbg	line, "game.c", 54
+L0007:	rts
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ testCollision (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_testCollision: near
+
+	.dbg	func, "testCollision", "00", extern, "_testCollision"
+
+.segment	"CODE"
+
+;
+; collision = check_collision(&knight, &Enemy); //currently only checks the 1 enemy. Need to change to check all of them
+;
+	.dbg	line, "game.c", 68
+	lda     #<(_knight)
+	ldx     #>(_knight)
+	jsr     pushax
+	lda     #<(_Enemy)
+	ldx     #>(_Enemy)
+	jsr     _check_collision
+	sta     _collision
+;
+; if (collision){
+;
+	.dbg	line, "game.c", 71
+	lda     _collision
+	beq     L0002
+;
+; pal_col(0,PINK); 
+;
+	.dbg	line, "game.c", 72
+	lda     #$00
+	jsr     pusha
+	lda     #$25
+;
+; else{
+;
+	.dbg	line, "game.c", 74
+	jmp     _pal_col
+;
+; pal_col(0,BLACK);
+;
+	.dbg	line, "game.c", 75
+L0002:	jsr     pusha
+	lda     #$0F
+	jmp     _pal_col
+
+	.dbg	line
+.endproc
 
 ; ---------------------------------------------------------------
 ; void __near__ main (void)
@@ -111,38 +356,46 @@ _pad1:
 
 .proc	_main: near
 
+	.dbg	func, "main", "00", extern, "_main"
+
 .segment	"CODE"
 
 ;
 ; ppu_off(); // screen off
 ;
+	.dbg	line, "game.c", 13
 	jsr     _ppu_off
 ;
-; pal_bg(palette); // load the BG palette
+; pal_bg(paletteBg); // load the BG palette
 ;
-	lda     #<(_palette)
-	ldx     #>(_palette)
+	.dbg	line, "game.c", 15
+	lda     #<(_paletteBg)
+	ldx     #>(_paletteBg)
 	jsr     _pal_bg
 ;
-; pal_spr(palette);//load the sprite palette
+; pal_spr(paletteSp);//load the sprite palette
 ;
-	lda     #<(_palette)
-	ldx     #>(_palette)
+	.dbg	line, "game.c", 16
+	lda     #<(_paletteSp)
+	ldx     #>(_paletteSp)
 	jsr     _pal_spr
 ;
 ; bank_spr(1);
 ;
+	.dbg	line, "game.c", 17
 	lda     #$01
 	jsr     _bank_spr
 ;
 ; vram_adr(NTADR_A(3,3)); // screen is 32 x 30 tiles
 ;
+	.dbg	line, "game.c", 20
 	ldx     #$20
 	lda     #$63
 	jsr     _vram_adr
 ;
 ; vram_write(text,sizeof(text)); 
 ;
+	.dbg	line, "game.c", 21
 	lda     #<(_text)
 	ldx     #>(_text)
 	jsr     pushax
@@ -152,79 +405,36 @@ _pad1:
 ;
 ; ppu_on_all(); // turn on screen
 ;
+	.dbg	line, "game.c", 25
 	jsr     _ppu_on_all
 ;
 ; pad1 = pad_poll(0); //read first controller input
 ;
+	.dbg	line, "game.c", 31
 L0002:	lda     #$00
 	jsr     _pad_poll
 	sta     _pad1
 ;
-; if(pad1 & PAD_LEFT){
+; move();
 ;
-	and     #$02
-	beq     L000D
+	.dbg	line, "game.c", 33
+	jsr     _move
 ;
-; xPos -= 1;
+; testCollision();
 ;
-	dec     _xPos
+	.dbg	line, "game.c", 34
+	jsr     _testCollision
 ;
-; else if (pad1 & PAD_RIGHT){
+; drawSprites();
 ;
-	jmp     L000E
-L000D:	lda     _pad1
-	and     #$01
-	beq     L000E
-;
-; xPos += 1;
-;
-	inc     _xPos
-;
-; if(pad1 & PAD_UP){
-;
-L000E:	lda     _pad1
-	and     #$08
-	beq     L000F
-;
-; yPos -= 1;
-;
-	dec     _yPos
-;
-; else if (pad1 & PAD_DOWN){
-;
-	jmp     L000A
-L000F:	lda     _pad1
-	and     #$04
-	beq     L000A
-;
-; yPos += 1;
-;
-	inc     _yPos
-;
-; ppu_wait_nmi(); // wait till beginning of the frame
-;
-L000A:	jsr     _ppu_wait_nmi
-;
-; oam_clear(); //Clear the sprite buffer.
-;
-	jsr     _oam_clear
-;
-; oam_meta_spr(xPos,yPos,metasprite); //Push 1 metasprite to the buffer.
-;
-	jsr     decsp2
-	lda     _xPos
-	ldy     #$01
-	sta     (sp),y
-	lda     _yPos
-	dey
-	sta     (sp),y
-	lda     #<(_metasprite)
-	ldx     #>(_metasprite)
-	jsr     _oam_meta_spr
+	.dbg	line, "game.c", 35
+	jsr     _drawSprites
 ;
 ; while (1){
 ;
+	.dbg	line, "game.c", 28
 	jmp     L0002
 
+	.dbg	line
 .endproc
 

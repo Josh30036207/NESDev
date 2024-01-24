@@ -13,3 +13,33 @@ const unsigned char metasprite2[]={
 	  8,  8,0x11,0,
 	128
 };
+
+const unsigned char metasprite3[]={
+	  0,  0,0x00,0,
+	  0,  8,0x10,0,
+	  8,  0,0x00,0|OAM_FLIP_H,
+	  8,  8,0x10,0|OAM_FLIP_H,
+	128
+};
+
+//Colours
+#define BLACK 0x0f
+#define DK_GY 0x00
+#define LT_GY 0x10
+#define WHITE 0x30
+#define BLUE 0x0C
+#define BROWN 0x07
+#define PINK 0x25
+
+const unsigned char paletteBg[]={ //palette for the background
+BLACK, DK_GY, BLUE, PINK,
+WHITE,0,0,0,
+0,0,0,0,
+0,0,0,0
+}; 
+const unsigned char paletteSp[]={//palette for the sprites
+PINK, DK_GY, BLUE, BROWN,
+WHITE,0,0,0,
+0,0,0,0,
+0,0,0,0
+}; 
