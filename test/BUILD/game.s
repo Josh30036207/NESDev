@@ -10,11 +10,14 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "game.c", 1464, 1706135041
+	.dbg		file, "game.c", 3899, 1706150143
 	.dbg		file, "LIB/neslib.h", 9196, 1701627949
 	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
 	.dbg		file, "sprites.h", 809, 1706134841
-	.dbg		file, "game.h", 649, 1706134877
+	.dbg		file, "game.h", 1372, 1706150249
+	.dbg		file, "BG/map1.c", 545, 1706149967
+	.dbg		file, "BG/map2.c", 545, 1706150065
+	.dbg		file, "BG/map3.c", 545, 1706150043
 	.forceimport	__STARTUP__
 	.dbg		sym, "pal_bg", "00", extern, "_pal_bg"
 	.dbg		sym, "pal_spr", "00", extern, "_pal_spr"
@@ -27,8 +30,12 @@
 	.dbg		sym, "pad_poll", "00", extern, "_pad_poll"
 	.dbg		sym, "bank_spr", "00", extern, "_bank_spr"
 	.dbg		sym, "vram_adr", "00", extern, "_vram_adr"
+	.dbg		sym, "vram_put", "00", extern, "_vram_put"
 	.dbg		sym, "vram_write", "00", extern, "_vram_write"
+	.dbg		sym, "memcpy", "00", extern, "_memcpy"
+	.dbg		sym, "get_pad_new", "00", extern, "_get_pad_new"
 	.dbg		sym, "check_collision", "00", extern, "_check_collision"
+	.dbg		sym, "set_scroll_y", "00", extern, "_set_scroll_y"
 	.import		_pal_bg
 	.import		_pal_spr
 	.import		_pal_col
@@ -40,28 +47,54 @@
 	.import		_pad_poll
 	.import		_bank_spr
 	.import		_vram_adr
+	.import		_vram_put
 	.import		_vram_write
+	.import		_memcpy
+	.import		_get_pad_new
 	.import		_check_collision
+	.import		_set_scroll_y
 	.export		_metasprite
 	.export		_metasprite2
 	.export		_metasprite3
 	.export		_paletteBg
 	.export		_paletteSp
 	.export		_pad1
+	.export		_pad1_new
 	.export		_collision
 	.export		_text
+	.export		_collision_L
+	.export		_collision_R
+	.export		_collision_U
+	.export		_collision_D
+	.export		_which_bg
+	.export		_p_maps
+	.export		_coordinates
+	.export		_temp1
+	.export		_temp2
+	.export		_temp3
+	.export		_temp4
+	.export		_temp_x
+	.export		_temp_y
+	.export		_c_map
 	.export		_knight
 	.export		_Enemy
+	.export		_map1
+	.export		_map2
+	.export		_map3
+	.export		_All_Collision_Maps
 	.export		_drawSprites
 	.export		_move
 	.export		_testCollision
+	.export		_draw_bg
+	.export		_bgCollision
+	.export		_check_start
 	.export		_main
 
 .segment	"DATA"
 
 _knight:
-	.byte	$14
-	.byte	$14
+	.byte	$28
+	.byte	$3E
 	.byte	$0F
 	.byte	$0F
 _Enemy:
@@ -163,13 +196,770 @@ _paletteSp:
 _text:
 	.byte	$59,$6F,$75,$20,$74,$72,$75,$6C,$79,$20,$61,$72,$65,$20,$74,$68
 	.byte	$65,$20,$64,$61,$72,$6B,$20,$73,$6F,$75,$6C,$00
+_map1:
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_map2:
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_map3:
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_All_Collision_Maps:
+	.addr	_map1
+	.addr	_map2
+	.addr	_map3
 
 .segment	"BSS"
 
 _pad1:
 	.res	1,$00
+_pad1_new:
+	.res	1,$00
 _collision:
 	.res	1,$00
+_collision_L:
+	.res	1,$00
+_collision_R:
+	.res	1,$00
+_collision_U:
+	.res	1,$00
+_collision_D:
+	.res	1,$00
+_which_bg:
+	.res	1,$00
+_p_maps:
+	.res	2,$00
+_coordinates:
+	.res	1,$00
+_temp1:
+	.res	1,$00
+_temp2:
+	.res	1,$00
+_temp3:
+	.res	1,$00
+_temp4:
+	.res	1,$00
+_temp_x:
+	.res	1,$00
+_temp_y:
+	.res	1,$00
+_c_map:
+	.res	240,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ drawSprites (void)
@@ -186,17 +976,17 @@ _collision:
 ;
 ; ppu_wait_nmi(); // wait till beginning of the frame
 ;
-	.dbg	line, "game.c", 57
+	.dbg	line, "game.c", 72
 	jsr     _ppu_wait_nmi
 ;
 ; oam_clear();
 ;
-	.dbg	line, "game.c", 59
+	.dbg	line, "game.c", 74
 	jsr     _oam_clear
 ;
 ; oam_meta_spr(knight.x, knight.y, metasprite);
 ;
-	.dbg	line, "game.c", 62
+	.dbg	line, "game.c", 77
 	jsr     decsp2
 	lda     _knight
 	ldy     #$01
@@ -210,7 +1000,7 @@ _collision:
 ;
 ; oam_meta_spr(Enemy.x, Enemy.y, metasprite2);
 ;
-	.dbg	line, "game.c", 64
+	.dbg	line, "game.c", 79
 	jsr     decsp2
 	lda     _Enemy
 	ldy     #$01
@@ -240,58 +1030,96 @@ _collision:
 ;
 ; if(pad1 & PAD_LEFT){
 ;
-	.dbg	line, "game.c", 42
+	.dbg	line, "game.c", 51
 	lda     _pad1
 	and     #$02
-	beq     L000A
+	beq     L000E
 ;
 ; knight.x -= 1;
 ;
-	.dbg	line, "game.c", 43
+	.dbg	line, "game.c", 52
 	dec     _knight
 ;
 ; else if (pad1 & PAD_RIGHT){
 ;
-	.dbg	line, "game.c", 45
-	jmp     L000B
-L000A:	lda     _pad1
+	.dbg	line, "game.c", 54
+	jmp     L0004
+L000E:	lda     _pad1
 	and     #$01
-	beq     L000B
+	beq     L0004
 ;
 ; knight.x += 1;
 ;
-	.dbg	line, "game.c", 46
+	.dbg	line, "game.c", 55
+	inc     _knight
+;
+; bgCollision();
+;
+	.dbg	line, "game.c", 57
+L0004:	jsr     _bgCollision
+;
+; if(collision_R) knight.x -= 1;
+;
+	.dbg	line, "game.c", 58
+	lda     _collision_R
+	beq     L0005
+	dec     _knight
+;
+; if(collision_L) knight.x += 1;
+;
+	.dbg	line, "game.c", 59
+L0005:	lda     _collision_L
+	beq     L0006
 	inc     _knight
 ;
 ; if(pad1 & PAD_UP){
 ;
-	.dbg	line, "game.c", 48
-L000B:	lda     _pad1
+	.dbg	line, "game.c", 60
+L0006:	lda     _pad1
 	and     #$08
-	beq     L000C
+	beq     L000F
 ;
 ; knight.y -= 1;
 ;
-	.dbg	line, "game.c", 49
+	.dbg	line, "game.c", 61
 	dec     _knight+1
 ;
 ; else if (pad1 & PAD_DOWN){
 ;
-	.dbg	line, "game.c", 51
-	rts
-L000C:	lda     _pad1
+	.dbg	line, "game.c", 63
+	jmp     L0009
+L000F:	lda     _pad1
 	and     #$04
-	beq     L0007
+	beq     L0009
 ;
 ; knight.y += 1;
 ;
-	.dbg	line, "game.c", 52
+	.dbg	line, "game.c", 64
+	inc     _knight+1
+;
+; bgCollision();
+;
+	.dbg	line, "game.c", 66
+L0009:	jsr     _bgCollision
+;
+; if(collision_D) knight.y -= 1;
+;
+	.dbg	line, "game.c", 67
+	lda     _collision_D
+	beq     L000A
+	dec     _knight+1
+;
+; if(collision_U) knight.y += 1;
+;
+	.dbg	line, "game.c", 68
+L000A:	lda     _collision_U
+	beq     L000B
 	inc     _knight+1
 ;
 ; }
 ;
-	.dbg	line, "game.c", 54
-L0007:	rts
+	.dbg	line, "game.c", 69
+L000B:	rts
 
 	.dbg	line
 .endproc
@@ -311,7 +1139,7 @@ L0007:	rts
 ;
 ; collision = check_collision(&knight, &Enemy); //currently only checks the 1 enemy. Need to change to check all of them
 ;
-	.dbg	line, "game.c", 68
+	.dbg	line, "game.c", 83
 	lda     #<(_knight)
 	ldx     #>(_knight)
 	jsr     pushax
@@ -322,28 +1150,498 @@ L0007:	rts
 ;
 ; if (collision){
 ;
-	.dbg	line, "game.c", 71
+	.dbg	line, "game.c", 86
 	lda     _collision
 	beq     L0002
 ;
 ; pal_col(0,PINK); 
 ;
-	.dbg	line, "game.c", 72
+	.dbg	line, "game.c", 87
 	lda     #$00
 	jsr     pusha
 	lda     #$25
 ;
 ; else{
 ;
-	.dbg	line, "game.c", 74
+	.dbg	line, "game.c", 89
 	jmp     _pal_col
 ;
 ; pal_col(0,BLACK);
 ;
-	.dbg	line, "game.c", 75
+	.dbg	line, "game.c", 90
 L0002:	jsr     pusha
 	lda     #$0F
 	jmp     _pal_col
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ draw_bg (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_draw_bg: near
+
+	.dbg	func, "draw_bg", "00", extern, "_draw_bg"
+
+.segment	"CODE"
+
+;
+; ppu_off(); // screen off
+;
+	.dbg	line, "game.c", 97
+	jsr     _ppu_off
+;
+; p_maps = All_Collision_Maps[which_bg];
+;
+	.dbg	line, "game.c", 99
+	ldx     #$00
+	lda     _which_bg
+	asl     a
+	bcc     L0019
+	inx
+	clc
+L0019:	adc     #<(_All_Collision_Maps)
+	sta     ptr1
+	txa
+	adc     #>(_All_Collision_Maps)
+	sta     ptr1+1
+	ldy     #$01
+	lda     (ptr1),y
+	sta     _p_maps+1
+	dey
+	lda     (ptr1),y
+	sta     _p_maps
+;
+; memcpy (c_map, p_maps, 240);
+;
+	.dbg	line, "game.c", 101
+	lda     #<(_c_map)
+	ldx     #>(_c_map)
+	jsr     pushax
+	lda     _p_maps
+	ldx     _p_maps+1
+	jsr     pushax
+	ldx     #$00
+	lda     #$F0
+	jsr     _memcpy
+;
+; vram_adr(NAMETABLE_A);
+;
+	.dbg	line, "game.c", 104
+	ldx     #$20
+	lda     #$00
+	jsr     _vram_adr
+;
+; for(temp_y = 0; temp_y < 15; ++temp_y){
+;
+	.dbg	line, "game.c", 107
+	lda     #$00
+	sta     _temp_y
+L001A:	lda     _temp_y
+	cmp     #$0F
+	bcs     L0003
+;
+; for(temp_x = 0; temp_x < 16; ++temp_x){
+;
+	.dbg	line, "game.c", 108
+	lda     #$00
+	sta     _temp_x
+L001B:	lda     _temp_x
+	cmp     #$10
+	bcs     L001E
+;
+; temp1 = (temp_y << 4) + temp_x;
+;
+	.dbg	line, "game.c", 109
+	lda     _temp_y
+	asl     a
+	asl     a
+	asl     a
+	asl     a
+	clc
+	adc     _temp_x
+	sta     _temp1
+;
+; if(c_map[temp1]){
+;
+	.dbg	line, "game.c", 111
+	ldy     _temp1
+	lda     _c_map,y
+	beq     L001D
+;
+; vram_put(0x02); // wall
+;
+	.dbg	line, "game.c", 112
+	lda     #$02
+	jsr     _vram_put
+;
+; vram_put(0x02);
+;
+	.dbg	line, "game.c", 113
+	lda     #$02
+;
+; else{
+;
+	.dbg	line, "game.c", 115
+	jmp     L0017
+;
+; vram_put(0); // blank
+;
+	.dbg	line, "game.c", 116
+L001D:	jsr     _vram_put
+;
+; vram_put(0);
+;
+	.dbg	line, "game.c", 117
+	lda     #$00
+L0017:	jsr     _vram_put
+;
+; for(temp_x = 0; temp_x < 16; ++temp_x){
+;
+	.dbg	line, "game.c", 108
+	inc     _temp_x
+	jmp     L001B
+;
+; for(temp_x = 0; temp_x < 16; ++temp_x){
+;
+	.dbg	line, "game.c", 122
+L001E:	lda     #$00
+	sta     _temp_x
+L001F:	lda     _temp_x
+	cmp     #$10
+	bcs     L0022
+;
+; temp1 = (temp_y << 4) + temp_x;
+;
+	.dbg	line, "game.c", 123
+	lda     _temp_y
+	asl     a
+	asl     a
+	asl     a
+	asl     a
+	clc
+	adc     _temp_x
+	sta     _temp1
+;
+; if(c_map[temp1]){
+;
+	.dbg	line, "game.c", 125
+	ldy     _temp1
+	lda     _c_map,y
+	beq     L0021
+;
+; vram_put(0x02); // wall
+;
+	.dbg	line, "game.c", 126
+	lda     #$02
+	jsr     _vram_put
+;
+; vram_put(0x02);
+;
+	.dbg	line, "game.c", 127
+	lda     #$02
+;
+; else{
+;
+	.dbg	line, "game.c", 129
+	jmp     L0018
+;
+; vram_put(0); // blank
+;
+	.dbg	line, "game.c", 130
+L0021:	jsr     _vram_put
+;
+; vram_put(0);
+;
+	.dbg	line, "game.c", 131
+	lda     #$00
+L0018:	jsr     _vram_put
+;
+; for(temp_x = 0; temp_x < 16; ++temp_x){
+;
+	.dbg	line, "game.c", 122
+	inc     _temp_x
+	jmp     L001F
+;
+; for(temp_y = 0; temp_y < 15; ++temp_y){
+;
+	.dbg	line, "game.c", 107
+L0022:	inc     _temp_y
+	jmp     L001A
+;
+; ppu_on_all(); // turn on screen
+;
+	.dbg	line, "game.c", 136
+L0003:	jmp     _ppu_on_all
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ bgCollision (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_bgCollision: near
+
+	.dbg	func, "bgCollision", "00", extern, "_bgCollision"
+
+.segment	"CODE"
+
+;
+; collision_L = 0;
+;
+	.dbg	line, "game.c", 142
+	lda     #$00
+	sta     _collision_L
+;
+; collision_R = 0;
+;
+	.dbg	line, "game.c", 143
+	sta     _collision_R
+;
+; collision_U = 0;
+;
+	.dbg	line, "game.c", 144
+	sta     _collision_U
+;
+; collision_D = 0;
+;
+	.dbg	line, "game.c", 145
+	sta     _collision_D
+;
+; temp_x = knight.x; // left side
+;
+	.dbg	line, "game.c", 147
+	lda     _knight
+	sta     _temp_x
+;
+; temp_y = knight.y; // top side
+;
+	.dbg	line, "game.c", 148
+	lda     _knight+1
+	sta     _temp_y
+;
+; if(temp_y >= 0xf0) return;
+;
+	.dbg	line, "game.c", 150
+	cmp     #$F0
+	bcc     L0015
+;
+; }
+;
+	.dbg	line, "game.c", 184
+	rts
+;
+; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper left
+;
+	.dbg	line, "game.c", 153
+L0015:	lda     _temp_x
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     ptr1
+	lda     _temp_y
+	and     #$F0
+	clc
+	adc     ptr1
+	sta     _coordinates
+;
+; if(c_map[coordinates]){ // find a corner in the collision map
+;
+	.dbg	line, "game.c", 154
+	ldy     _coordinates
+	lda     _c_map,y
+	beq     L0012
+;
+; ++collision_L;
+;
+	.dbg	line, "game.c", 155
+	inc     _collision_L
+;
+; ++collision_U;
+;
+	.dbg	line, "game.c", 156
+	inc     _collision_U
+;
+; temp_x = knight.x + knight.width; // right side
+;
+	.dbg	line, "game.c", 159
+L0012:	lda     _knight
+	clc
+	adc     _knight+2
+	sta     _temp_x
+;
+; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper right
+;
+	.dbg	line, "game.c", 161
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     ptr1
+	lda     _temp_y
+	and     #$F0
+	clc
+	adc     ptr1
+	sta     _coordinates
+;
+; if(c_map[coordinates]){
+;
+	.dbg	line, "game.c", 162
+	ldy     _coordinates
+	lda     _c_map,y
+	beq     L0013
+;
+; ++collision_R;
+;
+	.dbg	line, "game.c", 163
+	inc     _collision_R
+;
+; ++collision_U;
+;
+	.dbg	line, "game.c", 164
+	inc     _collision_U
+;
+; temp_y = knight.y + knight.height; // bottom side
+;
+	.dbg	line, "game.c", 167
+L0013:	lda     _knight+1
+	clc
+	adc     _knight+3
+	sta     _temp_y
+;
+; if(temp_y >= 0xf0) return;
+;
+	.dbg	line, "game.c", 168
+	cmp     #$F0
+	bcs     L000A
+;
+; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom right
+;
+	.dbg	line, "game.c", 171
+	lda     _temp_x
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     ptr1
+	lda     _temp_y
+	and     #$F0
+	clc
+	adc     ptr1
+	sta     _coordinates
+;
+; if(c_map[coordinates]){
+;
+	.dbg	line, "game.c", 172
+	ldy     _coordinates
+	lda     _c_map,y
+	beq     L0014
+;
+; ++collision_R;
+;
+	.dbg	line, "game.c", 173
+	inc     _collision_R
+;
+; ++collision_D;
+;
+	.dbg	line, "game.c", 174
+	inc     _collision_D
+;
+; temp_x = knight.x; // left side
+;
+	.dbg	line, "game.c", 177
+L0014:	lda     _knight
+	sta     _temp_x
+;
+; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom left
+;
+	.dbg	line, "game.c", 179
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     ptr1
+	lda     _temp_y
+	and     #$F0
+	clc
+	adc     ptr1
+	sta     _coordinates
+;
+; if(c_map[coordinates]){
+;
+	.dbg	line, "game.c", 180
+	ldy     _coordinates
+	lda     _c_map,y
+	beq     L000A
+;
+; ++collision_L;
+;
+	.dbg	line, "game.c", 181
+	inc     _collision_L
+;
+; ++collision_D;
+;
+	.dbg	line, "game.c", 182
+	inc     _collision_D
+;
+; }
+;
+	.dbg	line, "game.c", 184
+L000A:	rts
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ check_start (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_check_start: near
+
+	.dbg	func, "check_start", "00", extern, "_check_start"
+
+.segment	"CODE"
+
+;
+; if(pad1_new & PAD_START){
+;
+	.dbg	line, "game.c", 188
+	lda     _pad1_new
+	and     #$10
+	beq     L0002
+;
+; ++which_bg;
+;
+	.dbg	line, "game.c", 189
+	inc     _which_bg
+;
+; if(which_bg >= 3) which_bg = 0;
+;
+	.dbg	line, "game.c", 190
+	lda     _which_bg
+	cmp     #$03
+	bcc     L0003
+	lda     #$00
+	sta     _which_bg
+;
+; draw_bg();
+;
+	.dbg	line, "game.c", 191
+L0003:	jmp     _draw_bg
+;
+; }
+;
+	.dbg	line, "game.c", 193
+L0002:	rts
 
 	.dbg	line
 .endproc
@@ -403,36 +1701,66 @@ L0002:	jsr     pusha
 	lda     #$1C
 	jsr     _vram_write
 ;
-; ppu_on_all(); // turn on screen
+; bank_spr(1);
+;
+	.dbg	line, "game.c", 23
+	lda     #$01
+	jsr     _bank_spr
+;
+; set_scroll_y(0xff); //shift the bg down 1 pixel
 ;
 	.dbg	line, "game.c", 25
-	jsr     _ppu_on_all
+	ldx     #$00
+	lda     #$FF
+	jsr     _set_scroll_y
+;
+; draw_bg();
+;
+	.dbg	line, "game.c", 27
+	jsr     _draw_bg
+;
+; ppu_wait_nmi();
+;
+	.dbg	line, "game.c", 37
+L0002:	jsr     _ppu_wait_nmi
 ;
 ; pad1 = pad_poll(0); //read first controller input
 ;
-	.dbg	line, "game.c", 31
-L0002:	lda     #$00
+	.dbg	line, "game.c", 38
+	lda     #$00
 	jsr     _pad_poll
 	sta     _pad1
 ;
+; pad1_new = get_pad_new(0); // newly pressed button. do pad_poll first
+;
+	.dbg	line, "game.c", 39
+	lda     #$00
+	jsr     _get_pad_new
+	sta     _pad1_new
+;
 ; move();
 ;
-	.dbg	line, "game.c", 33
+	.dbg	line, "game.c", 41
 	jsr     _move
 ;
-; testCollision();
+; testCollision();//sprite collisions
 ;
-	.dbg	line, "game.c", 34
+	.dbg	line, "game.c", 42
 	jsr     _testCollision
 ;
 ; drawSprites();
 ;
-	.dbg	line, "game.c", 35
+	.dbg	line, "game.c", 43
 	jsr     _drawSprites
+;
+; check_start();
+;
+	.dbg	line, "game.c", 44
+	jsr     _check_start
 ;
 ; while (1){
 ;
-	.dbg	line, "game.c", 28
+	.dbg	line, "game.c", 34
 	jmp     L0002
 
 	.dbg	line
