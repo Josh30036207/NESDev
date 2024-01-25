@@ -54,3 +54,4 @@ dkms.conf
 # Not My Stuff
 cc65/
 Mesen-X/
+CSV2C.py

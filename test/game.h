@@ -27,3 +27,6 @@ struct hollow Enemy = {200, 147, 15, 15};
 void drawSprites(void);
 void move(void);	
 void testCollision(void);
+void draw_bg(void);
+void bg_collision(void);
+void check_start(void);

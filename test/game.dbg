@@ -23,7 +23,7 @@ file	id=2,name="LIB/neslib.s",size=16276,mtime=0x656CC82D,mod=0
 file	id=3,name="LIB/nesdoug.s",size=12479,mtime=0x656CC82D,mod=0
 file	id=4,name="MUSIC/famitone2.s",size=28813,mtime=0x656CC82D,mod=0
 file	id=5,name="Alpha.chr",size=8192,mtime=0x65B1790F,mod=0
-file	id=6,name="game.s",size=7920,mtime=0x65B18E02,mod=1
+file	id=6,name="game.s",size=7920,mtime=0x65B1ABF7,mod=1
 file	id=7,name="C:\Users\joshu\Desktop\repo\NESDev - Current\cc65\asminc/longbranch.mac",size=2632,mtime=0x6531E4E7,mod=1
 file	id=8,name="game.c",size=1464,mtime=0x65B18E01,mod=1
 file	id=9,name="LIB/neslib.h",size=9196,mtime=0x656CC82D,mod=1
