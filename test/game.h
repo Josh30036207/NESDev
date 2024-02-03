@@ -21,6 +21,9 @@ unsigned char temp4;
 unsigned char temp_x;
 unsigned char temp_y;
 
+int i;
+int testNum = 0;
+
 unsigned char c_map[240];
 // collision map 
 
@@ -36,7 +39,11 @@ unsigned char c_map[240];
 
 
 struct hollow knight = {40,62,15,15};
-struct hollow Enemy = {200, 147, 15, 15};
+struct hollow Enemy = {64, 147, 15, 15};
+int numberOfE = 7; // Can't use value for creating an array 
+struct hollow E[7]; //Maximum of 7 enemies per row, prob don't want more than that anyway
+
+
 
 
 //the 3 maps
@@ -56,3 +63,4 @@ void testCollision(void);
 void draw_bg(void);
 void bgCollision(void);
 void check_start(void);
+void loadEnemyData(void);

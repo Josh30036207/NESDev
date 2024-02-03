@@ -18,12 +18,12 @@ void main (void) {
 	// set a starting point on the screen
 	// vram_adr(NTADR_A(x,y));
 	vram_adr(NTADR_A(3,3)); // screen is 32 x 30 tiles
-	vram_write(text,sizeof(text)); 
+	
 	
 	bank_spr(1);
 	
 	set_scroll_y(0xff); //shift the bg down 1 pixel
-	
+	loadEnemyData();
 	draw_bg();
 	
 	//ppu_on_all(); //	turn on screen
@@ -39,6 +39,9 @@ void main (void) {
 		pad1_new = get_pad_new(0); // newly pressed button. do pad_poll first
 
 		move();
+		i = 0;
+		testCollision();//sprite collisions
+		i++;
 		testCollision();//sprite collisions
 		drawSprites();
 		check_start();
@@ -76,19 +79,23 @@ void drawSprites(void){
 	// draw 2 metasprites
 	oam_meta_spr(knight.x, knight.y, metasprite);
 	
-	oam_meta_spr(Enemy.x, Enemy.y, metasprite2);
+	//oam_meta_spr(Enemy.x, Enemy.y, metasprite2);
+	
+	for(i = 0; i < numberOfE; i++){
+		oam_meta_spr(E[i].x, E[i].y , metasprite2);
+	}
+	//oam_meta_spr(E[0].x, E[0].y , metasprite2);
 }
 
-void testCollision(void){
-	collision = check_collision(&knight, &Enemy); //currently only checks the 1 enemy. Need to change to check all of them
-		
-	// change the BG color, if sprites are touching
-	if (collision){
-		pal_col(0,PINK); 
+void testCollision(void){//currently only checks the 1 enemy. Need to change to check all of them
+	for(i = 0; i < numberOfE; i++){
+		collision = check_collision(&knight, &E[i]); 
+		// change the BG color, if sprites are touching
+		if (collision){
+			E[i].y++;
+		}
 	}
-	else{
-		pal_col(0,BLACK);
-	}
+	
 }
 
 
@@ -103,15 +110,21 @@ void draw_bg(void){
 	// this sets a start position on the BG, top left of screen
 	vram_adr(NAMETABLE_A);
 	
-	// draw a row of tiles
+	// draw a row of tiles //Each "block" is a 2X2 tile, so call vram_put twice to per row for each block
+	//Check what block is in the map. Put a 0 for an empty space
 	for(temp_y = 0; temp_y < 15; ++temp_y){
 		for(temp_x = 0; temp_x < 16; ++temp_x){
 			temp1 = (temp_y << 4) + temp_x;
 
-			if(c_map[temp1]){
+			if(c_map[temp1] == 1){
 				vram_put(0x02); // wall
 				vram_put(0x02);
 			}
+			else if(c_map[temp1] == 2){
+				vram_put(0x03); // Pink
+				vram_put(0x03);
+			}
+			
 			else{
 				vram_put(0); // blank
 				vram_put(0);
@@ -122,9 +135,13 @@ void draw_bg(void){
 		for(temp_x = 0; temp_x < 16; ++temp_x){
 			temp1 = (temp_y << 4) + temp_x;
 
-			if(c_map[temp1]){
+			if(c_map[temp1] == 1){
 				vram_put(0x02); // wall
 				vram_put(0x02);
+			}
+			else if(c_map[temp1] == 2){
+				vram_put(0x03); // Pink
+				vram_put(0x03);
 			}
 			else{
 				vram_put(0); // blank
@@ -190,4 +207,22 @@ void check_start(void){
 		if(which_bg >= 3) which_bg = 0;
 		draw_bg();
 	}	
+}
+
+void loadEnemyData(void){
+	E[0].x = 64;
+	E[0].y = 64;
+	E[0].width = 15;
+	E[0].height = 15;
+
+	E[1].x = 128;
+	E[1].y = 128;
+	E[1].width = 15;
+	E[1].height = 15;
+
+	E[2].x = 420;
+	E[2].y = 64;
+	E[2].width = 15;
+	E[2].height = 15;
+	numberOfE = 3;
 }
