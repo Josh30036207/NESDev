@@ -22,6 +22,8 @@ const unsigned char metasprite3[]={
 	128
 };
 
+
+
 //Colours
 #define BLACK 0x0f
 #define DK_GY 0x00
@@ -32,14 +34,14 @@ const unsigned char metasprite3[]={
 #define PINK 0x25
 
 const unsigned char paletteBg[]={ //palette for the background
-BLACK, DK_GY, BLUE, PINK,
+BLACK, DK_GY, BLUE, 0x15,
 WHITE,0,0,0,
 0,0,0,0,
 0,0,0,0
 }; 
 const unsigned char paletteSp[]={//palette for the sprites
 PINK, DK_GY, BLUE, BROWN,
-WHITE,0,0,0,
+WHITE,0x16,0,0x00,
 0,0,0,0,
 0,0,0,0
 }; 

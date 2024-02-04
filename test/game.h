@@ -22,7 +22,7 @@ unsigned char temp_x;
 unsigned char temp_y;
 
 int i;
-int testNum = 0;
+int health = 8;
 
 unsigned char c_map[240];
 // collision map 
@@ -40,8 +40,8 @@ unsigned char c_map[240];
 
 struct hollow knight = {40,62,15,15};
 struct hollow Enemy = {64, 147, 15, 15};
-int numberOfE = 7; // Can't use value for creating an array 
-struct hollow E[7]; //Maximum of 7 enemies per row, prob don't want more than that anyway
+int numberOfE = 3; // Can't use value for creating an array 
+struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 
 
 
@@ -64,3 +64,4 @@ void draw_bg(void);
 void bgCollision(void);
 void check_start(void);
 void loadEnemyData(void);
+void updateHealth(void);

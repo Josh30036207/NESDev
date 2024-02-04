@@ -24,6 +24,8 @@ void main (void) {
 	
 	set_scroll_y(0xff); //shift the bg down 1 pixel
 	loadEnemyData();
+
+	
 	draw_bg();
 	
 	//ppu_on_all(); //	turn on screen
@@ -46,6 +48,7 @@ void main (void) {
 		drawSprites();
 		check_start();
 		
+		updateHealth();
 		
 	}
 }
@@ -75,16 +78,17 @@ void drawSprites(void){
 	ppu_wait_nmi(); // wait till beginning of the frame
 	// clear all sprites from sprite buffer
 	oam_clear();
-	
+	bank_spr(1);//switch to player spritesheet
 	// draw 2 metasprites
+	
 	oam_meta_spr(knight.x, knight.y, metasprite);
 	
-	//oam_meta_spr(Enemy.x, Enemy.y, metasprite2);
+	
 	
 	for(i = 0; i < numberOfE; i++){
 		oam_meta_spr(E[i].x, E[i].y , metasprite2);
 	}
-	//oam_meta_spr(E[0].x, E[0].y , metasprite2);
+	
 }
 
 void testCollision(void){//currently only checks the 1 enemy. Need to change to check all of them
@@ -124,7 +128,10 @@ void draw_bg(void){
 				vram_put(0x03); // Pink
 				vram_put(0x03);
 			}
-			
+			else if(c_map[temp1] == 3){
+				vram_put(0x07); // Heart 
+				vram_put(0x08); // Heart 
+			}
 			else{
 				vram_put(0); // blank
 				vram_put(0);
@@ -142,6 +149,10 @@ void draw_bg(void){
 			else if(c_map[temp1] == 2){
 				vram_put(0x03); // Pink
 				vram_put(0x03);
+			}
+			else if(c_map[temp1] == 3){
+				vram_put(0x17); // Heart 
+				vram_put(0x18);
 			}
 			else{
 				vram_put(0); // blank
@@ -209,7 +220,7 @@ void check_start(void){
 	}	
 }
 
-void loadEnemyData(void){
+void loadEnemyData(void){ //need to load enemies from map
 	E[0].x = 64;
 	E[0].y = 64;
 	E[0].width = 15;
@@ -225,4 +236,11 @@ void loadEnemyData(void){
 	E[2].width = 15;
 	E[2].height = 15;
 	numberOfE = 3;
+}
+
+void updateHealth(void){
+	for(i = 0; i < health; i++){
+		oam_spr((i*8), 0, 0x80, 1);
+	}
+	
 }
