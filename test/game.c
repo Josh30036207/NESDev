@@ -3,6 +3,7 @@
 #include "sprites.h"
 #include "game.h"
 
+
 #pragma bss-name(push, "ZEROPAGE")
 
 
@@ -23,7 +24,7 @@ void main (void) {
 	bank_spr(1);
 	
 	set_scroll_y(0xff); //shift the bg down 1 pixel
-	loadEnemyData();
+	
 
 	
 	draw_bg();
@@ -41,14 +42,13 @@ void main (void) {
 		pad1_new = get_pad_new(0); // newly pressed button. do pad_poll first
 
 		move();
-		i = 0;
-		testCollision();//sprite collisions
-		i++;
+	
 		testCollision();//sprite collisions
 		drawSprites();
 		check_start();
 		
 		updateHealth();
+		loseCheck();
 		
 	}
 }
@@ -59,12 +59,14 @@ void move (void){
 	}
 	else if (pad1 & PAD_RIGHT){
 		knight.x += 1;
+		
 	}
 	bgCollision();
 	if(collision_R) knight.x -= 1;
 	if(collision_L) knight.x += 1;
 	if(pad1 & PAD_UP){
 		knight.y -= 1;
+		health -= 1;
 	}
 	else if (pad1 & PAD_DOWN){
 		knight.y += 1;
@@ -160,7 +162,7 @@ void draw_bg(void){
 			}
 		}
 	}
-	
+	loadEnemyData();
 	ppu_on_all(); // turn on screen
 }
 
@@ -235,7 +237,12 @@ void loadEnemyData(void){ //need to load enemies from map
 	E[2].y = 64;
 	E[2].width = 15;
 	E[2].height = 15;
-	numberOfE = 3;
+
+	
+	// which_bg holds a char with the level number. e.g. map_1 = 1
+	numberOfE = which_bg+1;
+	
+
 }
 
 void updateHealth(void){
@@ -243,4 +250,18 @@ void updateHealth(void){
 		oam_spr((i*8), 0, 0x80, 1);
 	}
 	
+}
+
+void loseCheck(void){//
+	if(health < 0){
+		//lose
+		ppu_off(); // screen off //make this better and fade in/out after saying you died
+		which_bg = 0;
+		draw_bg();
+		health = maxHealth;
+		knight.x = 120;
+		knight.y = 112;
+		ppu_wait_nmi();
+		ppu_on_all();
+	}
 }

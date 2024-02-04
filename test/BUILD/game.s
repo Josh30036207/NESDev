@@ -10,12 +10,12 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "game.c", 4970, 1707062623
+	.dbg		file, "game.c", 5256, 1707068698
 	.dbg		file, "LIB/neslib.h", 9196, 1701627949
 	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
 	.dbg		file, "sprites.h", 819, 1707063665
-	.dbg		file, "game.h", 1608, 1707064566
-	.dbg		file, "BG/map1.c", 545, 1707057022
+	.dbg		file, "game.h", 1674, 1707068245
+	.dbg		file, "BG/map1.c", 549, 1707067796
 	.dbg		file, "BG/map2.c", 545, 1706150065
 	.dbg		file, "BG/map3.c", 545, 1706150043
 	.forceimport	__STARTUP__
@@ -75,11 +75,13 @@
 	.export		_temp_y
 	.export		_i
 	.export		_health
+	.export		_maxHealth
 	.export		_c_map
 	.export		_knight
 	.export		_Enemy
 	.export		_numberOfE
 	.export		_E
+	.export		_tempE
 	.export		_map1
 	.export		_map2
 	.export		_map3
@@ -92,11 +94,14 @@
 	.export		_check_start
 	.export		_loadEnemyData
 	.export		_updateHealth
+	.export		_loseCheck
 	.export		_main
 
 .segment	"DATA"
 
 _health:
+	.word	$0008
+_maxHealth:
 	.word	$0008
 _knight:
 	.byte	$28
@@ -972,6 +977,8 @@ _c_map:
 	.res	240,$00
 _E:
 	.res	12,$00
+_tempE:
+	.res	12,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ drawSprites (void)
@@ -988,23 +995,23 @@ _E:
 ;
 ; ppu_wait_nmi(); // wait till beginning of the frame
 ;
-	.dbg	line, "game.c", 78
+	.dbg	line, "game.c", 80
 	jsr     _ppu_wait_nmi
 ;
 ; oam_clear();
 ;
-	.dbg	line, "game.c", 80
+	.dbg	line, "game.c", 82
 	jsr     _oam_clear
 ;
 ; bank_spr(1);//switch to player spritesheet
 ;
-	.dbg	line, "game.c", 81
+	.dbg	line, "game.c", 83
 	lda     #$01
 	jsr     _bank_spr
 ;
 ; oam_meta_spr(knight.x, knight.y, metasprite);
 ;
-	.dbg	line, "game.c", 84
+	.dbg	line, "game.c", 86
 	jsr     decsp2
 	lda     _knight
 	ldy     #$01
@@ -1018,7 +1025,7 @@ _E:
 ;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 88
+	.dbg	line, "game.c", 90
 	lda     #$00
 	sta     _i
 	sta     _i+1
@@ -1032,7 +1039,7 @@ L0007:	bpl     L0003
 ;
 ; oam_meta_spr(E[i].x, E[i].y , metasprite2);
 ;
-	.dbg	line, "game.c", 89
+	.dbg	line, "game.c", 91
 	jsr     decsp2
 	lda     _i
 	ldx     _i+1
@@ -1064,7 +1071,7 @@ L0007:	bpl     L0003
 ;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 88
+	.dbg	line, "game.c", 90
 	inc     _i
 	bne     L0002
 	inc     _i+1
@@ -1072,7 +1079,7 @@ L0007:	bpl     L0003
 ;
 ; }
 ;
-	.dbg	line, "game.c", 92
+	.dbg	line, "game.c", 94
 L0003:	rts
 
 	.dbg	line
@@ -1118,71 +1125,81 @@ L000E:	lda     _pad1
 ;
 ; bgCollision();
 ;
-	.dbg	line, "game.c", 63
+	.dbg	line, "game.c", 64
 L0004:	jsr     _bgCollision
 ;
 ; if(collision_R) knight.x -= 1;
 ;
-	.dbg	line, "game.c", 64
+	.dbg	line, "game.c", 65
 	lda     _collision_R
 	beq     L0005
 	dec     _knight
 ;
 ; if(collision_L) knight.x += 1;
 ;
-	.dbg	line, "game.c", 65
+	.dbg	line, "game.c", 66
 L0005:	lda     _collision_L
 	beq     L0006
 	inc     _knight
 ;
 ; if(pad1 & PAD_UP){
 ;
-	.dbg	line, "game.c", 66
+	.dbg	line, "game.c", 67
 L0006:	lda     _pad1
 	and     #$08
 	beq     L000F
 ;
 ; knight.y -= 1;
 ;
-	.dbg	line, "game.c", 67
+	.dbg	line, "game.c", 68
 	dec     _knight+1
+;
+; health -= 1;
+;
+	.dbg	line, "game.c", 69
+	lda     _health
+	sec
+	sbc     #$01
+	sta     _health
+	bcs     L000A
+	dec     _health+1
 ;
 ; else if (pad1 & PAD_DOWN){
 ;
-	.dbg	line, "game.c", 69
-	jmp     L0009
+	.dbg	line, "game.c", 71
+	jmp     L000A
 L000F:	lda     _pad1
 	and     #$04
-	beq     L0009
+	beq     L000A
 ;
 ; knight.y += 1;
 ;
-	.dbg	line, "game.c", 70
+	.dbg	line, "game.c", 72
 	inc     _knight+1
 ;
 ; bgCollision();
 ;
-	.dbg	line, "game.c", 72
-L0009:	jsr     _bgCollision
+	.dbg	line, "game.c", 74
+L000A:	jsr     _bgCollision
 ;
 ; if(collision_D) knight.y -= 1;
 ;
-	.dbg	line, "game.c", 73
+	.dbg	line, "game.c", 75
 	lda     _collision_D
-	beq     L000A
+	beq     L000B
 	dec     _knight+1
 ;
 ; if(collision_U) knight.y += 1;
 ;
-	.dbg	line, "game.c", 74
-L000A:	lda     _collision_U
-	beq     L000B
+	.dbg	line, "game.c", 76
+L000B:	lda     _collision_U
+	beq     L000C
 	inc     _knight+1
 ;
 ; }
 ;
-	.dbg	line, "game.c", 75
-L000B:	rts
+	.dbg	line, "game.c", 77
+L000C:	rts
 
 	.dbg	line
 .endproc
@@ -1202,7 +1219,7 @@ L000B:	rts
 ;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 95
+	.dbg	line, "game.c", 97
 	lda     #$00
 	sta     _i
 	sta     _i+1
@@ -1216,7 +1233,7 @@ L0008:	bpl     L0003
 ;
 ; collision = check_collision(&knight, &E[i]); 
 ;
-	.dbg	line, "game.c", 96
+	.dbg	line, "game.c", 98
 	lda     #<(_knight)
 	ldx     #>(_knight)
 	jsr     pushax
@@ -1235,13 +1252,13 @@ L0008:	bpl     L0003
 ;
 ; if (collision){
 ;
-	.dbg	line, "game.c", 98
+	.dbg	line, "game.c", 100
 	lda     _collision
 	beq     L0004
 ;
 ; E[i].y++;
 ;
-	.dbg	line, "game.c", 99
+	.dbg	line, "game.c", 101
 	lda     _i
 	ldx     _i+1
 	jsr     aslax2
@@ -1264,7 +1281,7 @@ L0008:	bpl     L0003
 ;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 95
+	.dbg	line, "game.c", 97
 L0004:	inc     _i
 	bne     L0002
 	inc     _i+1
@@ -1272,7 +1289,7 @@ L0004:	inc     _i
 ;
 ; }
 ;
-	.dbg	line, "game.c", 103
+	.dbg	line, "game.c", 105
 L0003:	rts
 
 	.dbg	line
@@ -1293,12 +1310,12 @@ L0003:	rts
 ;
 ; ppu_off(); // screen off
 ;
-	.dbg	line, "game.c", 108
+	.dbg	line, "game.c", 110
 	jsr     _ppu_off
 ;
 ; p_maps = All_Collision_Maps[which_bg];
 ;
-	.dbg	line, "game.c", 110
+	.dbg	line, "game.c", 112
 	ldx     #$00
 	lda     _which_bg
 	asl     a
@@ -1319,7 +1336,7 @@ L0025:	adc     #<(_All_Collision_Maps)
 ;
 ; memcpy (c_map, p_maps, 240);
 ;
-	.dbg	line, "game.c", 112
+	.dbg	line, "game.c", 114
 	lda     #<(_c_map)
 	ldx     #>(_c_map)
 	jsr     pushax
@@ -1332,14 +1349,14 @@ L0025:	adc     #<(_All_Collision_Maps)
 ;
 ; vram_adr(NAMETABLE_A);
 ;
-	.dbg	line, "game.c", 115
+	.dbg	line, "game.c", 117
 	ldx     #$20
 	lda     #$00
 	jsr     _vram_adr
 ;
 ; for(temp_y = 0; temp_y < 15; ++temp_y){
 ;
-	.dbg	line, "game.c", 119
+	.dbg	line, "game.c", 121
 	lda     #$00
 	sta     _temp_y
 L0026:	lda     _temp_y
@@ -1348,7 +1365,7 @@ L0026:	lda     _temp_y
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 120
+	.dbg	line, "game.c", 122
 	lda     #$00
 	sta     _temp_x
 L0027:	lda     _temp_x
@@ -1357,7 +1374,7 @@ L0027:	lda     _temp_x
 ;
 ; temp1 = (temp_y << 4) + temp_x;
 ;
-	.dbg	line, "game.c", 121
+	.dbg	line, "game.c", 123
 	lda     _temp_y
 	asl     a
 	asl     a
@@ -1369,7 +1386,7 @@ L0027:	lda     _temp_x
 ;
 ; if(c_map[temp1] == 1){
 ;
-	.dbg	line, "game.c", 123
+	.dbg	line, "game.c", 125
 	ldy     _temp1
 	lda     _c_map,y
 	cmp     #$01
@@ -1377,18 +1394,18 @@ L0027:	lda     _temp_x
 ;
 ; vram_put(0x02); // wall
 ;
-	.dbg	line, "game.c", 124
+	.dbg	line, "game.c", 126
 	lda     #$02
 	jsr     _vram_put
 ;
 ; vram_put(0x02);
 ;
-	.dbg	line, "game.c", 125
+	.dbg	line, "game.c", 127
 	lda     #$02
 ;
 ; else if(c_map[temp1] == 2){
 ;
-	.dbg	line, "game.c", 127
+	.dbg	line, "game.c", 129
 	jmp     L0023
 L000A:	ldy     _temp1
 	lda     _c_map,y
@@ -1397,18 +1414,18 @@ L000A:	ldy     _temp1
 ;
 ; vram_put(0x03); // Pink
 ;
-	.dbg	line, "game.c", 128
+	.dbg	line, "game.c", 130
 	lda     #$03
 	jsr     _vram_put
 ;
 ; vram_put(0x03);
 ;
-	.dbg	line, "game.c", 129
+	.dbg	line, "game.c", 131
 	lda     #$03
 ;
 ; else if(c_map[temp1] == 3){
 ;
-	.dbg	line, "game.c", 131
+	.dbg	line, "game.c", 133
 	jmp     L0023
 L000D:	ldy     _temp1
 	lda     _c_map,y
@@ -1417,41 +1434,41 @@ L000D:	ldy     _temp1
 ;
 ; vram_put(0x07); // Heart 
 ;
-	.dbg	line, "game.c", 132
+	.dbg	line, "game.c", 134
 	lda     #$07
 	jsr     _vram_put
 ;
 ; vram_put(0x08); // Heart 
 ;
-	.dbg	line, "game.c", 133
+	.dbg	line, "game.c", 135
 	lda     #$08
 ;
 ; else{
 ;
-	.dbg	line, "game.c", 135
+	.dbg	line, "game.c", 137
 	jmp     L0023
 ;
 ; vram_put(0); // blank
 ;
-	.dbg	line, "game.c", 136
+	.dbg	line, "game.c", 138
 L0028:	lda     #$00
 	jsr     _vram_put
 ;
 ; vram_put(0);
 ;
-	.dbg	line, "game.c", 137
+	.dbg	line, "game.c", 139
 	lda     #$00
 L0023:	jsr     _vram_put
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 120
+	.dbg	line, "game.c", 122
 	inc     _temp_x
 	jmp     L0027
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 142
+	.dbg	line, "game.c", 144
 L0029:	lda     #$00
 	sta     _temp_x
 L002A:	lda     _temp_x
@@ -1460,7 +1477,7 @@ L002A:	lda     _temp_x
 ;
 ; temp1 = (temp_y << 4) + temp_x;
 ;
-	.dbg	line, "game.c", 143
+	.dbg	line, "game.c", 145
 	lda     _temp_y
 	asl     a
 	asl     a
@@ -1472,7 +1489,7 @@ L002A:	lda     _temp_x
 ;
 ; if(c_map[temp1] == 1){
 ;
-	.dbg	line, "game.c", 145
+	.dbg	line, "game.c", 147
 	ldy     _temp1
 	lda     _c_map,y
 	cmp     #$01
@@ -1480,18 +1497,18 @@ L002A:	lda     _temp_x
 ;
 ; vram_put(0x02); // wall
 ;
-	.dbg	line, "game.c", 146
+	.dbg	line, "game.c", 148
 	lda     #$02
 	jsr     _vram_put
 ;
 ; vram_put(0x02);
 ;
-	.dbg	line, "game.c", 147
+	.dbg	line, "game.c", 149
 	lda     #$02
 ;
 ; else if(c_map[temp1] == 2){
 ;
-	.dbg	line, "game.c", 149
+	.dbg	line, "game.c", 151
 	jmp     L0024
 L0017:	ldy     _temp1
 	lda     _c_map,y
@@ -1500,18 +1517,18 @@ L0017:	ldy     _temp1
 ;
 ; vram_put(0x03); // Pink
 ;
-	.dbg	line, "game.c", 150
+	.dbg	line, "game.c", 152
 	lda     #$03
 	jsr     _vram_put
 ;
 ; vram_put(0x03);
 ;
-	.dbg	line, "game.c", 151
+	.dbg	line, "game.c", 153
 	lda     #$03
 ;
 ; else if(c_map[temp1] == 3){
 ;
-	.dbg	line, "game.c", 153
+	.dbg	line, "game.c", 155
 	jmp     L0024
 L001A:	ldy     _temp1
 	lda     _c_map,y
@@ -1520,48 +1537,53 @@ L001A:	ldy     _temp1
 ;
 ; vram_put(0x17); // Heart 
 ;
-	.dbg	line, "game.c", 154
+	.dbg	line, "game.c", 156
 	lda     #$17
 	jsr     _vram_put
 ;
 ; vram_put(0x18);
 ;
-	.dbg	line, "game.c", 155
+	.dbg	line, "game.c", 157
 	lda     #$18
 ;
 ; else{
 ;
-	.dbg	line, "game.c", 157
+	.dbg	line, "game.c", 159
 	jmp     L0024
 ;
 ; vram_put(0); // blank
 ;
-	.dbg	line, "game.c", 158
+	.dbg	line, "game.c", 160
 L002B:	lda     #$00
 	jsr     _vram_put
 ;
 ; vram_put(0);
 ;
-	.dbg	line, "game.c", 159
+	.dbg	line, "game.c", 161
 	lda     #$00
 L0024:	jsr     _vram_put
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 142
+	.dbg	line, "game.c", 144
 	inc     _temp_x
 	jmp     L002A
 ;
 ; for(temp_y = 0; temp_y < 15; ++temp_y){
 ;
-	.dbg	line, "game.c", 119
+	.dbg	line, "game.c", 121
 L002C:	inc     _temp_y
 	jmp     L0026
 ;
+; loadEnemyData();
+;
+	.dbg	line, "game.c", 165
+L0003:	jsr     _loadEnemyData
+;
 ; ppu_on_all(); // turn on screen
 ;
-	.dbg	line, "game.c", 164
-L0003:	jmp     _ppu_on_all
+	.dbg	line, "game.c", 166
+	jmp     _ppu_on_all
 
 	.dbg	line
 .endproc
@@ -1581,51 +1603,51 @@ L0003:	jmp     _ppu_on_all
 ;
 ; collision_L = 0;
 ;
-	.dbg	line, "game.c", 170
+	.dbg	line, "game.c", 172
 	lda     #$00
 	sta     _collision_L
 ;
 ; collision_R = 0;
 ;
-	.dbg	line, "game.c", 171
+	.dbg	line, "game.c", 173
 	sta     _collision_R
 ;
 ; collision_U = 0;
 ;
-	.dbg	line, "game.c", 172
+	.dbg	line, "game.c", 174
 	sta     _collision_U
 ;
 ; collision_D = 0;
 ;
-	.dbg	line, "game.c", 173
+	.dbg	line, "game.c", 175
 	sta     _collision_D
 ;
 ; temp_x = knight.x; // left side
 ;
-	.dbg	line, "game.c", 175
+	.dbg	line, "game.c", 177
 	lda     _knight
 	sta     _temp_x
 ;
 ; temp_y = knight.y; // top side
 ;
-	.dbg	line, "game.c", 176
+	.dbg	line, "game.c", 178
 	lda     _knight+1
 	sta     _temp_y
 ;
 ; if(temp_y >= 0xf0) return;
 ;
-	.dbg	line, "game.c", 178
+	.dbg	line, "game.c", 180
 	cmp     #$F0
 	bcc     L0015
 ;
 ; }
 ;
-	.dbg	line, "game.c", 212
+	.dbg	line, "game.c", 214
 	rts
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper left
 ;
-	.dbg	line, "game.c", 181
+	.dbg	line, "game.c", 183
 L0015:	lda     _temp_x
 	lsr     a
 	lsr     a
@@ -1640,24 +1662,24 @@ L0015:	lda     _temp_x
 ;
 ; if(c_map[coordinates]){ // find a corner in the collision map
 ;
-	.dbg	line, "game.c", 182
+	.dbg	line, "game.c", 184
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L0012
 ;
 ; ++collision_L;
 ;
-	.dbg	line, "game.c", 183
+	.dbg	line, "game.c", 185
 	inc     _collision_L
 ;
 ; ++collision_U;
 ;
-	.dbg	line, "game.c", 184
+	.dbg	line, "game.c", 186
 	inc     _collision_U
 ;
 ; temp_x = knight.x + knight.width; // right side
 ;
-	.dbg	line, "game.c", 187
+	.dbg	line, "game.c", 189
 L0012:	lda     _knight
 	clc
 	adc     _knight+2
@@ -1665,7 +1687,7 @@ L0012:	lda     _knight
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper right
 ;
-	.dbg	line, "game.c", 189
+	.dbg	line, "game.c", 191
 	lsr     a
 	lsr     a
 	lsr     a
@@ -1679,24 +1701,24 @@ L0012:	lda     _knight
 ;
 ; if(c_map[coordinates]){
 ;
-	.dbg	line, "game.c", 190
+	.dbg	line, "game.c", 192
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L0013
 ;
 ; ++collision_R;
 ;
-	.dbg	line, "game.c", 191
+	.dbg	line, "game.c", 193
 	inc     _collision_R
 ;
 ; ++collision_U;
 ;
-	.dbg	line, "game.c", 192
+	.dbg	line, "game.c", 194
 	inc     _collision_U
 ;
 ; temp_y = knight.y + knight.height; // bottom side
 ;
-	.dbg	line, "game.c", 195
+	.dbg	line, "game.c", 197
 L0013:	lda     _knight+1
 	clc
 	adc     _knight+3
@@ -1704,13 +1726,13 @@ L0013:	lda     _knight+1
 ;
 ; if(temp_y >= 0xf0) return;
 ;
-	.dbg	line, "game.c", 196
+	.dbg	line, "game.c", 198
 	cmp     #$F0
 	bcs     L000A
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom right
 ;
-	.dbg	line, "game.c", 199
+	.dbg	line, "game.c", 201
 	lda     _temp_x
 	lsr     a
 	lsr     a
@@ -1725,30 +1747,30 @@ L0013:	lda     _knight+1
 ;
 ; if(c_map[coordinates]){
 ;
-	.dbg	line, "game.c", 200
+	.dbg	line, "game.c", 202
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L0014
 ;
 ; ++collision_R;
 ;
-	.dbg	line, "game.c", 201
+	.dbg	line, "game.c", 203
 	inc     _collision_R
 ;
 ; ++collision_D;
 ;
-	.dbg	line, "game.c", 202
+	.dbg	line, "game.c", 204
 	inc     _collision_D
 ;
 ; temp_x = knight.x; // left side
 ;
-	.dbg	line, "game.c", 205
+	.dbg	line, "game.c", 207
 L0014:	lda     _knight
 	sta     _temp_x
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom left
 ;
-	.dbg	line, "game.c", 207
+	.dbg	line, "game.c", 209
 	lsr     a
 	lsr     a
 	lsr     a
@@ -1762,24 +1784,24 @@ L0014:	lda     _knight
 ;
 ; if(c_map[coordinates]){
 ;
-	.dbg	line, "game.c", 208
+	.dbg	line, "game.c", 210
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L000A
 ;
 ; ++collision_L;
 ;
-	.dbg	line, "game.c", 209
+	.dbg	line, "game.c", 211
 	inc     _collision_L
 ;
 ; ++collision_D;
 ;
-	.dbg	line, "game.c", 210
+	.dbg	line, "game.c", 212
 	inc     _collision_D
 ;
 ; }
 ;
-	.dbg	line, "game.c", 212
+	.dbg	line, "game.c", 214
 L000A:	rts
 
 	.dbg	line
@@ -1800,19 +1822,19 @@ L000A:	rts
 ;
 ; if(pad1_new & PAD_START){
 ;
-	.dbg	line, "game.c", 216
+	.dbg	line, "game.c", 218
 	lda     _pad1_new
 	and     #$10
 	beq     L0002
 ;
 ; ++which_bg;
 ;
-	.dbg	line, "game.c", 217
+	.dbg	line, "game.c", 219
 	inc     _which_bg
 ;
 ; if(which_bg >= 3) which_bg = 0;
 ;
-	.dbg	line, "game.c", 218
+	.dbg	line, "game.c", 220
 	lda     _which_bg
 	cmp     #$03
 	bcc     L0003
@@ -1821,12 +1843,12 @@ L000A:	rts
 ;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 219
+	.dbg	line, "game.c", 221
 L0003:	jmp     _draw_bg
 ;
 ; }
 ;
-	.dbg	line, "game.c", 221
+	.dbg	line, "game.c", 223
 L0002:	rts
 
 	.dbg	line
@@ -1847,82 +1869,86 @@ L0002:	rts
 ;
 ; E[0].x = 64;
 ;
-	.dbg	line, "game.c", 224
+	.dbg	line, "game.c", 226
 	lda     #$40
 	sta     _E
 ;
 ; E[0].y = 64;
 ;
-	.dbg	line, "game.c", 225
+	.dbg	line, "game.c", 227
 	sta     _E+1
 ;
 ; E[0].width = 15;
 ;
-	.dbg	line, "game.c", 226
+	.dbg	line, "game.c", 228
 	lda     #$0F
 	sta     _E+2
 ;
 ; E[0].height = 15;
 ;
-	.dbg	line, "game.c", 227
+	.dbg	line, "game.c", 229
 	sta     _E+3
 ;
 ; E[1].x = 128;
 ;
-	.dbg	line, "game.c", 229
+	.dbg	line, "game.c", 231
 	lda     #$80
 	sta     _E+4
 ;
 ; E[1].y = 128;
 ;
-	.dbg	line, "game.c", 230
+	.dbg	line, "game.c", 232
 	sta     _E+5
 ;
 ; E[1].width = 15;
 ;
-	.dbg	line, "game.c", 231
+	.dbg	line, "game.c", 233
 	lda     #$0F
 	sta     _E+6
 ;
 ; E[1].height = 15;
 ;
-	.dbg	line, "game.c", 232
+	.dbg	line, "game.c", 234
 	sta     _E+7
 ;
 ; E[2].x = 420;
 ;
-	.dbg	line, "game.c", 234
+	.dbg	line, "game.c", 236
 	lda     #$A4
 	sta     _E+8
 ;
 ; E[2].y = 64;
 ;
-	.dbg	line, "game.c", 235
+	.dbg	line, "game.c", 237
 	lda     #$40
 	sta     _E+9
 ;
 ; E[2].width = 15;
 ;
-	.dbg	line, "game.c", 236
+	.dbg	line, "game.c", 238
 	lda     #$0F
 	sta     _E+10
 ;
 ; E[2].height = 15;
 ;
-	.dbg	line, "game.c", 237
+	.dbg	line, "game.c", 239
 	sta     _E+11
 ;
-; numberOfE = 3;
+; numberOfE = which_bg+1;
 ;
-	.dbg	line, "game.c", 238
+	.dbg	line, "game.c", 243
 	ldx     #$00
-	lda     #$03
-	sta     _numberOfE
+	lda     _which_bg
+	clc
+	adc     #$01
+	bcc     L0002
+	inx
+L0002:	sta     _numberOfE
 	stx     _numberOfE+1
 ;
 ; }
 ;
-	.dbg	line, "game.c", 239
+	.dbg	line, "game.c", 246
 	rts
 
 	.dbg	line
@@ -1943,7 +1969,7 @@ L0002:	rts
 ;
 ; for(i = 0; i < health; i++){
 ;
-	.dbg	line, "game.c", 242
+	.dbg	line, "game.c", 249
 	lda     #$00
 	sta     _i
 	sta     _i+1
@@ -1957,7 +1983,7 @@ L0007:	bpl     L0003
 ;
 ; oam_spr((i*8), 0, 0x80, 1);
 ;
-	.dbg	line, "game.c", 243
+	.dbg	line, "game.c", 250
 	jsr     decsp3
 	lda     _i
 	asl     a
@@ -1976,7 +2002,7 @@ L0007:	bpl     L0003
 ;
 ; for(i = 0; i < health; i++){
 ;
-	.dbg	line, "game.c", 242
+	.dbg	line, "game.c", 249
 	inc     _i
 	bne     L0002
 	inc     _i+1
@@ -1984,8 +2010,82 @@ L0007:	bpl     L0003
 ;
 ; }
 ;
-	.dbg	line, "game.c", 246
+	.dbg	line, "game.c", 253
 L0003:	rts
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ loseCheck (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_loseCheck: near
+
+	.dbg	func, "loseCheck", "00", extern, "_loseCheck"
+
+.segment	"CODE"
+
+;
+; if(health < 0){
+;
+	.dbg	line, "game.c", 256
+	ldx     _health+1
+	cpx     #$80
+	bcc     L0002
+;
+; ppu_off(); // screen off
+;
+	.dbg	line, "game.c", 258
+	jsr     _ppu_off
+;
+; which_bg = 0;
+;
+	.dbg	line, "game.c", 259
+	lda     #$00
+	sta     _which_bg
+;
+; draw_bg();
+;
+	.dbg	line, "game.c", 260
+	jsr     _draw_bg
+;
+; health = maxHealth;
+;
+	.dbg	line, "game.c", 261
+	lda     _maxHealth+1
+	sta     _health+1
+	lda     _maxHealth
+	sta     _health
+;
+; knight.x = 120;
+;
+	.dbg	line, "game.c", 262
+	lda     #$78
+	sta     _knight
+;
+; knight.y = 112;
+;
+	.dbg	line, "game.c", 263
+	lda     #$70
+	sta     _knight+1
+;
+; ppu_wait_nmi();
+;
+	.dbg	line, "game.c", 264
+	jsr     _ppu_wait_nmi
+;
+; ppu_on_all();
+;
+	.dbg	line, "game.c", 265
+	jmp     _ppu_on_all
+;
+; }
+;
+	.dbg	line, "game.c", 267
+L0002:	rts
 
 	.dbg	line
 .endproc
@@ -2005,125 +2105,106 @@ L0003:	rts
 ;
 ; ppu_off(); // screen off
 ;
-	.dbg	line, "game.c", 13
+	.dbg	line, "game.c", 14
 	jsr     _ppu_off
 ;
 ; pal_bg(paletteBg); // load the BG palette
 ;
-	.dbg	line, "game.c", 15
+	.dbg	line, "game.c", 16
 	lda     #<(_paletteBg)
 	ldx     #>(_paletteBg)
 	jsr     _pal_bg
 ;
 ; pal_spr(paletteSp);//load the sprite palette
 ;
-	.dbg	line, "game.c", 16
+	.dbg	line, "game.c", 17
 	lda     #<(_paletteSp)
 	ldx     #>(_paletteSp)
 	jsr     _pal_spr
 ;
 ; bank_spr(1);
 ;
-	.dbg	line, "game.c", 17
+	.dbg	line, "game.c", 18
 	lda     #$01
 	jsr     _bank_spr
 ;
 ; vram_adr(NTADR_A(3,3)); // screen is 32 x 30 tiles
 ;
-	.dbg	line, "game.c", 20
+	.dbg	line, "game.c", 21
 	ldx     #$20
 	lda     #$63
 	jsr     _vram_adr
 ;
 ; bank_spr(1);
 ;
-	.dbg	line, "game.c", 23
+	.dbg	line, "game.c", 24
 	lda     #$01
 	jsr     _bank_spr
 ;
 ; set_scroll_y(0xff); //shift the bg down 1 pixel
 ;
-	.dbg	line, "game.c", 25
+	.dbg	line, "game.c", 26
 	ldx     #$00
 	lda     #$FF
 	jsr     _set_scroll_y
 ;
-; loadEnemyData();
-;
-	.dbg	line, "game.c", 26
-	jsr     _loadEnemyData
-;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 29
+	.dbg	line, "game.c", 30
 	jsr     _draw_bg
 ;
 ; ppu_wait_nmi();
 ;
-	.dbg	line, "game.c", 39
+	.dbg	line, "game.c", 40
 L0002:	jsr     _ppu_wait_nmi
 ;
 ; pad1 = pad_poll(0); //read first controller input
 ;
-	.dbg	line, "game.c", 40
+	.dbg	line, "game.c", 41
 	lda     #$00
 	jsr     _pad_poll
 	sta     _pad1
 ;
 ; pad1_new = get_pad_new(0); // newly pressed button. do pad_poll first
 ;
-	.dbg	line, "game.c", 41
+	.dbg	line, "game.c", 42
 	lda     #$00
 	jsr     _get_pad_new
 	sta     _pad1_new
 ;
 ; move();
 ;
-	.dbg	line, "game.c", 43
+	.dbg	line, "game.c", 44
 	jsr     _move
 ;
-; i = 0;
-;
-	.dbg	line, "game.c", 44
-	lda     #$00
-	sta     _i
-	sta     _i+1
-;
 ; testCollision();//sprite collisions
-;
-	.dbg	line, "game.c", 45
-	jsr     _testCollision
-;
-; i++;
 ;
 	.dbg	line, "game.c", 46
-	inc     _i
-	bne     L0005
-	inc     _i+1
-;
-; testCollision();//sprite collisions
-;
-	.dbg	line, "game.c", 47
-L0005:	jsr     _testCollision
+	jsr     _testCollision
 ;
 ; drawSprites();
 ;
-	.dbg	line, "game.c", 48
+	.dbg	line, "game.c", 47
 	jsr     _drawSprites
 ;
 ; check_start();
 ;
-	.dbg	line, "game.c", 49
+	.dbg	line, "game.c", 48
 	jsr     _check_start
 ;
 ; updateHealth();
 ;
-	.dbg	line, "game.c", 51
+	.dbg	line, "game.c", 50
 	jsr     _updateHealth
+;
+; loseCheck();
+;
+	.dbg	line, "game.c", 51
+	jsr     _loseCheck
 ;
 ; while (1){
 ;
-	.dbg	line, "game.c", 36
+	.dbg	line, "game.c", 37
 	jmp     L0002
 
 	.dbg	line
