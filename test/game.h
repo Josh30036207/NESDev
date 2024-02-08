@@ -1,3 +1,6 @@
+// collision data, made by exporting csv from Tiled, and slight modification by CSV2C.py
+#include "BG/maps.c" 
+
 
 // GLOBAL VARIABLES
 // all variables should be global for speed  //I'm sorry Marius
@@ -25,13 +28,12 @@ int i;
 int health = 8;
 int maxHealth = 8;
 
-int roomX; //Used to hold the value of where the player is when entering a new room. I.e. if X = 20 and moving up, enter at X = 20 as only the Y should change
-int roomY; 
 
-unsigned char c_map[240];
-// collision map 
 
-// there's some oddities in the palette code, black must be 0x0f, white must be 0x30
+
+
+
+
  
 
  struct hollow { //basic entity
@@ -48,17 +50,10 @@ int numberOfE = 3; // Can't use value for creating an array
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 struct hollow tempE[3];
 
-
-
-//the 3 maps
-// collision data, made by exporting csv from Tiled, and slight modification by CSV2C.py
-//#include "BG/map1.c" 
-//#include "BG/map2.c" 
-//#include "BG/map3.c" 
-#include "BG/maps.c" 
-
-
-const unsigned char * const All_Collision_Maps[] = {map1,map2,map3,map4};//add the maps to the array
+int mapPos = 4; //current position on map. Current small map = 3X3, pos 5 = center
+unsigned char c_map[240];
+// collision map 
+const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4};//add the maps to the array
 
 
 //Prototypes

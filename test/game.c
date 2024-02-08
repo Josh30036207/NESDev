@@ -278,27 +278,28 @@ void testButton(void){
 void nextRoom(void){ //currently just iterates the background - need to change to follow a proper map.
 	if(knight.y < 16){
 		knight.y = 224;
-		which_bg++;
-		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		mapPos -= mapWidth;
+		which_bg = worldMap[mapPos];
 		draw_bg();
 	}
 	else if(knight.y > 224){
 		knight.y = 16;
-		which_bg++;
-		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		mapPos += mapWidth;
+		which_bg = worldMap[mapPos];
 		draw_bg();
 	}
 	else if(knight.x <= 0 ){
-		knight.x = 240;
-		which_bg++;
-		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		knight.x = 239;
+		mapPos=mapPos-1;
+		which_bg = worldMap[mapPos];
 		draw_bg();
 	}
-	else if(knight.x > 240){
+	else if(knight.x >= 240){
 		knight.x = 1;//can't go less than 0, so have to be a pixel over
-		which_bg++;
-		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		mapPos=mapPos+1;
+		which_bg = worldMap[mapPos];
 		draw_bg();
 	}
+	
 	
 }
