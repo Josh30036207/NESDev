@@ -10,7 +10,7 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "game.c", 6106, 1707354281
+	.dbg		file, "game.c", 6598, 1707354971
 	.dbg		file, "LIB/neslib.h", 9196, 1701627949
 	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
 	.dbg		file, "sprites.h", 819, 1707063665
@@ -19,6 +19,7 @@
 	.forceimport	__STARTUP__
 	.dbg		sym, "pal_bg", "00", extern, "_pal_bg"
 	.dbg		sym, "pal_spr", "00", extern, "_pal_spr"
+	.dbg		sym, "pal_bright", "00", extern, "_pal_bright"
 	.dbg		sym, "ppu_wait_nmi", "00", extern, "_ppu_wait_nmi"
 	.dbg		sym, "ppu_off", "00", extern, "_ppu_off"
 	.dbg		sym, "ppu_on_all", "00", extern, "_ppu_on_all"
@@ -32,9 +33,11 @@
 	.dbg		sym, "memcpy", "00", extern, "_memcpy"
 	.dbg		sym, "get_pad_new", "00", extern, "_get_pad_new"
 	.dbg		sym, "check_collision", "00", extern, "_check_collision"
+	.dbg		sym, "pal_fade_to", "00", extern, "_pal_fade_to"
 	.dbg		sym, "set_scroll_y", "00", extern, "_set_scroll_y"
 	.import		_pal_bg
 	.import		_pal_spr
+	.import		_pal_bright
 	.import		_ppu_wait_nmi
 	.import		_ppu_off
 	.import		_ppu_on_all
@@ -48,6 +51,7 @@
 	.import		_memcpy
 	.import		_get_pad_new
 	.import		_check_collision
+	.import		_pal_fade_to
 	.import		_set_scroll_y
 	.export		_metasprite
 	.export		_metasprite2
@@ -2641,15 +2645,23 @@ L0002:	rts
 	cmp     #$10
 	bcs     L000C
 ;
-; knight.y = 224;
+; pal_fade_to(4,0); // fade to black
 ;
 	.dbg	line, "game.c", 280
+	lda     #$04
+	jsr     pusha
+	lda     #$00
+	jsr     _pal_fade_to
+;
+; knight.y = 224;
+;
+	.dbg	line, "game.c", 281
 	lda     #$E0
 	sta     _knight+1
 ;
 ; mapPos -= mapWidth;
 ;
-	.dbg	line, "game.c", 281
+	.dbg	line, "game.c", 282
 	lda     _mapWidth
 	eor     #$FF
 	sec
@@ -2662,26 +2674,34 @@ L0002:	rts
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 282
+	.dbg	line, "game.c", 283
 	lda     _mapPos
 ;
 ; else if(knight.y > 224){
 ;
-	.dbg	line, "game.c", 285
-	jmp     L0016
+	.dbg	line, "game.c", 289
+	jmp     L001A
 L000C:	lda     _knight+1
 	cmp     #$E1
 	bcc     L000D
 ;
+; pal_fade_to(4,0); // fade to black
+;
+	.dbg	line, "game.c", 290
+	lda     #$04
+	jsr     pusha
+	lda     #$00
+	jsr     _pal_fade_to
+;
 ; knight.y = 16;
 ;
-	.dbg	line, "game.c", 286
+	.dbg	line, "game.c", 291
 	lda     #$10
 	sta     _knight+1
 ;
 ; mapPos += mapWidth;
 ;
-	.dbg	line, "game.c", 287
+	.dbg	line, "game.c", 292
 	lda     _mapWidth
 	clc
 	adc     _mapPos
@@ -2692,25 +2712,33 @@ L000C:	lda     _knight+1
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 288
+	.dbg	line, "game.c", 293
 	lda     _mapPos
 ;
 ; else if(knight.x <= 0 ){
 ;
-	.dbg	line, "game.c", 291
-	jmp     L0016
+	.dbg	line, "game.c", 299
+	jmp     L001A
 L000D:	lda     _knight
 	bne     L000E
 ;
+; pal_fade_to(4,0); // fade to black
+;
+	.dbg	line, "game.c", 300
+	lda     #$04
+	jsr     pusha
+	lda     #$00
+	jsr     _pal_fade_to
+;
 ; knight.x = 239;
 ;
-	.dbg	line, "game.c", 292
+	.dbg	line, "game.c", 301
 	lda     #$EF
 	sta     _knight
 ;
 ; mapPos=mapPos-1;
 ;
-	.dbg	line, "game.c", 293
+	.dbg	line, "game.c", 302
 	lda     _mapPos
 	ldx     _mapPos+1
 	sec
@@ -2720,21 +2748,29 @@ L000D:	lda     _knight
 ;
 ; else if(knight.x >= 240){
 ;
-	.dbg	line, "game.c", 297
+	.dbg	line, "game.c", 309
 	jmp     L000A
 L000E:	lda     _knight
 	cmp     #$F0
 	bcc     L0009
 ;
+; pal_fade_to(4,0); // fade to black
+;
+	.dbg	line, "game.c", 310
+	lda     #$04
+	jsr     pusha
+	lda     #$00
+	jsr     _pal_fade_to
+;
 ; knight.x = 1;//can't go less than 0, so have to be a pixel over
 ;
-	.dbg	line, "game.c", 298
+	.dbg	line, "game.c", 311
 	lda     #$01
 	sta     _knight
 ;
 ; mapPos=mapPos+1;
 ;
-	.dbg	line, "game.c", 299
+	.dbg	line, "game.c", 312
 	lda     _mapPos
 	ldx     _mapPos+1
 	clc
@@ -2746,8 +2782,8 @@ L000A:	sta     _mapPos
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 300
-L0016:	sta     ptr1
+	.dbg	line, "game.c", 313
+L001A:	sta     ptr1
 	lda     _mapPos+1
 	clc
 	adc     #>(_worldMap)
@@ -2758,12 +2794,28 @@ L0016:	sta     ptr1
 ;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 301
-	jmp     _draw_bg
+	.dbg	line, "game.c", 314
+	jsr     _draw_bg
+;
+; drawSprites();
+;
+	.dbg	line, "game.c", 315
+	jsr     _drawSprites
+;
+; ppu_wait_nmi();
+;
+	.dbg	line, "game.c", 316
+	jsr     _ppu_wait_nmi
+;
+; pal_bright(4); // back to normal brightness 
+;
+	.dbg	line, "game.c", 317
+	lda     #$04
+	jmp     _pal_bright
 ;
 ; }
 ;
-	.dbg	line, "game.c", 305
+	.dbg	line, "game.c", 321
 L0009:	rts
 
 	.dbg	line
@@ -2856,35 +2908,35 @@ L0002:	jsr     _ppu_wait_nmi
 	.dbg	line, "game.c", 44
 	jsr     _move
 ;
-; testCollision();//sprite collisions
+; nextRoom();
 ;
 	.dbg	line, "game.c", 45
+	jsr     _nextRoom
+;
+; testCollision();//sprite collisions
+;
+	.dbg	line, "game.c", 46
 	jsr     _testCollision
 ;
 ; drawSprites();
 ;
-	.dbg	line, "game.c", 46
+	.dbg	line, "game.c", 47
 	jsr     _drawSprites
 ;
 ; check_start();
 ;
-	.dbg	line, "game.c", 47
+	.dbg	line, "game.c", 48
 	jsr     _check_start
 ;
 ; testButton();//currently select
 ;
-	.dbg	line, "game.c", 48
+	.dbg	line, "game.c", 49
 	jsr     _testButton
 ;
 ; updateHealth();
 ;
-	.dbg	line, "game.c", 49
-	jsr     _updateHealth
-;
-; nextRoom();
-;
 	.dbg	line, "game.c", 50
-	jsr     _nextRoom
+	jsr     _updateHealth
 ;
 ; loseCheck();
 ;

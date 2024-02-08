@@ -42,12 +42,12 @@ void main (void) {
 		pad1_new = get_pad_new(0); // newly pressed button. do pad_poll first
 
 		move();//move the player
+		nextRoom();
 		testCollision();//sprite collisions
 		drawSprites();
 		check_start();
 		testButton();//currently select
 		updateHealth();
-		nextRoom();
 		loseCheck();
 		
 	}
@@ -277,28 +277,44 @@ void testButton(void){
 
 void nextRoom(void){ //currently just iterates the background - need to change to follow a proper map.
 	if(knight.y < 16){
+		pal_fade_to(4,0); // fade to black
 		knight.y = 224;
 		mapPos -= mapWidth;
 		which_bg = worldMap[mapPos];
 		draw_bg();
+		drawSprites();
+		ppu_wait_nmi();
+		pal_bright(4); // back to normal brightness	
 	}
 	else if(knight.y > 224){
+		pal_fade_to(4,0); // fade to black
 		knight.y = 16;
 		mapPos += mapWidth;
 		which_bg = worldMap[mapPos];
 		draw_bg();
+		drawSprites();
+		ppu_wait_nmi();
+		pal_bright(4); // back to normal brightness	
 	}
 	else if(knight.x <= 0 ){
+		pal_fade_to(4,0); // fade to black
 		knight.x = 239;
 		mapPos=mapPos-1;
 		which_bg = worldMap[mapPos];
 		draw_bg();
+		drawSprites();
+		ppu_wait_nmi();
+		pal_bright(4); // back to normal brightness	
 	}
 	else if(knight.x >= 240){
+		pal_fade_to(4,0); // fade to black
 		knight.x = 1;//can't go less than 0, so have to be a pixel over
 		mapPos=mapPos+1;
 		which_bg = worldMap[mapPos];
 		draw_bg();
+		drawSprites();
+		ppu_wait_nmi();
+		pal_bright(4); // back to normal brightness	
 	}
 	
 	
