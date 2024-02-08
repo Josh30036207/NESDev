@@ -20,9 +20,6 @@ void main (void) {
 	// vram_adr(NTADR_A(x,y));
 	vram_adr(NTADR_A(3,3)); // screen is 32 x 30 tiles
 	
-	
-	bank_spr(1);
-	
 	set_scroll_y(0xff); //shift the bg down 1 pixel
 	
 
@@ -104,8 +101,6 @@ void testCollision(void){//currently only checks the 1 enemy. Need to change to 
 	
 }
 
-
-
 void draw_bg(void){
 	ppu_off(); // screen off
 	
@@ -163,6 +158,7 @@ void draw_bg(void){
 		}
 	}
 	loadEnemyData();
+	
 	ppu_on_all(); // turn on screen
 }
 
@@ -240,7 +236,7 @@ void loadEnemyData(void){ //need to load enemies from map
 
 	
 	// which_bg holds a char with the level number. e.g. map_1 = 1
-	numberOfE = which_bg+1;
+	//numberOfE = which_bg+1;
 	
 
 }
@@ -252,17 +248,50 @@ void updateHealth(void){
 	
 }
 
+void clearScreen(void){
+	ppu_off(); // screen off
+	vram_adr(NTADR_A(0,0));//set to top corner
+	i = 0;
+	do{
+		vram_put(0);
+		i++;
+	}while(i < 960);//32*30
+	ppu_on_all();
+}
+
 void loseCheck(void){//
-	if(health < 0){
+	if(health <= 0){
 		//lose
+		pal_fade_to(4,0); // fade to black
+		//you died
+		
+		
+		oam_clear();//clear sprite buffer
+		clearScreen();
+		vram_adr(NTADR_A(12,14)); // screen is 32 x 30 tiles
+		vram_write(text,sizeof(text));
+		pal_bright(4); // back to normal brightness	
+		i = 0;
+		do{
+			ppu_wait_nmi();
+			i++;
+		}while(i <= 180);
+		
+		
+		
+		//respawn at start
+		pal_fade_to(4,0); // fade to black
 		ppu_off(); // screen off //make this better and fade in/out after saying you died
+		clearScreen();
 		which_bg = 0;
 		draw_bg();
 		health = maxHealth;
-		knight.x = 120;
-		knight.y = 112;
+		//knight.x = 120;
+		//knight.y = 112;
 		ppu_wait_nmi();
 		ppu_on_all();
+		pal_bright(4); // back to normal brightness	
+		
 	}
 }
 

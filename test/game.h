@@ -9,7 +9,7 @@
 unsigned char pad1;
 unsigned char pad1_new;
 unsigned char collision;
-const unsigned char text[]="You truly are the dark soul"; // zero terminated c string
+const unsigned char text[]="You Died"; // zero terminated c string
 unsigned char collision_L;
 unsigned char collision_R;
 unsigned char collision_U;
@@ -27,12 +27,7 @@ unsigned char temp_y;
 int i;
 int health = 8;
 int maxHealth = 8;
-
-
-
-
-
-
+int iFrame = 0;
 
  
 
@@ -50,7 +45,7 @@ int numberOfE = 3; // Can't use value for creating an array
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 struct hollow tempE[3];
 
-int mapPos = 4; //current position on map. Current small map = 3X3, pos 5 = center
+
 unsigned char c_map[240];
 // collision map 
 const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4};//add the maps to the array
@@ -68,3 +63,4 @@ void updateHealth(void);
 void loseCheck(void);
 void testButton(void); //used to test features
 void nextRoom(void);//load next room if the player walks off the edge
+void clearScreen(void);

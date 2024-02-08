@@ -181,9 +181,10 @@ const unsigned char map4[]={
 };
 
 const unsigned char worldMap[]={
-0,1,0,
-3,0,4,
-0,2,0
+0,1,1,0,
+3,0,0,4,
+0,2,2,0
 };
 
-int mapWidth = 3; //used to help go up/down 
+int mapPos = 5; //Center of map
+int mapWidth = 4; //used to help go up/down 

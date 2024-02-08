@@ -34,7 +34,7 @@ const unsigned char metasprite3[]={
 #define PINK 0x25
 
 const unsigned char paletteBg[]={ //palette for the background
-BLACK, DK_GY, BLUE, 0x15,
+BLACK, DK_GY, BLUE, 0x16,
 WHITE,0,0,0,
 0,0,0,0,
 0,0,0,0
