@@ -41,13 +41,13 @@ void main (void) {
 		pad1 = pad_poll(0); //read first controller input
 		pad1_new = get_pad_new(0); // newly pressed button. do pad_poll first
 
-		move();
-	
+		move();//move the player
 		testCollision();//sprite collisions
 		drawSprites();
 		check_start();
-		
+		testButton();//currently select
 		updateHealth();
+		nextRoom();
 		loseCheck();
 		
 	}
@@ -66,7 +66,7 @@ void move (void){
 	if(collision_L) knight.x += 1;
 	if(pad1 & PAD_UP){
 		knight.y -= 1;
-		health -= 1;
+		
 	}
 	else if (pad1 & PAD_DOWN){
 		knight.y += 1;
@@ -213,11 +213,11 @@ void bgCollision(){
 	}
 }
 
-void check_start(void){
+void check_start(void){//Testing loading backgrounds
 	// if START is pressed, load another background
 	if(pad1_new & PAD_START){
 		++which_bg;
-		if(which_bg >= 3) which_bg = 0;
+		if(which_bg >= 2) which_bg = 0;
 		draw_bg();
 	}	
 }
@@ -264,4 +264,41 @@ void loseCheck(void){//
 		ppu_wait_nmi();
 		ppu_on_all();
 	}
+}
+
+
+void testButton(void){
+	if(pad1_new & PAD_SELECT){
+		health -= 1;
+		
+	}
+	
+}
+
+void nextRoom(void){ //currently just iterates the background - need to change to follow a proper map.
+	if(knight.y < 16){
+		knight.y = 224;
+		which_bg++;
+		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		draw_bg();
+	}
+	else if(knight.y > 224){
+		knight.y = 16;
+		which_bg++;
+		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		draw_bg();
+	}
+	else if(knight.x <= 0 ){
+		knight.x = 240;
+		which_bg++;
+		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		draw_bg();
+	}
+	else if(knight.x > 240){
+		knight.x = 1;//can't go less than 0, so have to be a pixel over
+		which_bg++;
+		if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+		draw_bg();
+	}
+	
 }

@@ -10,14 +10,12 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "game.c", 5256, 1707068698
+	.dbg		file, "game.c", 6370, 1707351941
 	.dbg		file, "LIB/neslib.h", 9196, 1701627949
 	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
 	.dbg		file, "sprites.h", 819, 1707063665
-	.dbg		file, "game.h", 1674, 1707068245
-	.dbg		file, "BG/map1.c", 549, 1707067796
-	.dbg		file, "BG/map2.c", 545, 1706150065
-	.dbg		file, "BG/map3.c", 545, 1706150043
+	.dbg		file, "game.h", 2029, 1707350733
+	.dbg		file, "BG/maps.c", 2180, 1707351387
 	.forceimport	__STARTUP__
 	.dbg		sym, "pal_bg", "00", extern, "_pal_bg"
 	.dbg		sym, "pal_spr", "00", extern, "_pal_spr"
@@ -76,6 +74,8 @@
 	.export		_i
 	.export		_health
 	.export		_maxHealth
+	.export		_roomX
+	.export		_roomY
 	.export		_c_map
 	.export		_knight
 	.export		_Enemy
@@ -85,6 +85,7 @@
 	.export		_map1
 	.export		_map2
 	.export		_map3
+	.export		_map4
 	.export		_All_Collision_Maps
 	.export		_drawSprites
 	.export		_move
@@ -95,6 +96,8 @@
 	.export		_loadEnemyData
 	.export		_updateHealth
 	.export		_loseCheck
+	.export		_testButton
+	.export		_nextRoom
 	.export		_main
 
 .segment	"DATA"
@@ -233,6 +236,8 @@ _map1:
 	.byte	$01
 	.byte	$01
 	.byte	$01
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -247,10 +252,8 @@ _map1:
 	.byte	$01
 	.byte	$01
 	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -322,22 +325,18 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$01
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$01
 	.byte	$00
 	.byte	$00
-	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$00
 	.byte	$00
@@ -353,23 +352,11 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$01
-	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
 	.byte	$01
 	.byte	$00
 	.byte	$00
@@ -403,6 +390,30 @@ _map1:
 	.byte	$00
 	.byte	$01
 	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -417,6 +428,8 @@ _map1:
 	.byte	$01
 	.byte	$01
 	.byte	$01
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -431,18 +444,8 @@ _map1:
 	.byte	$01
 	.byte	$01
 	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -451,6 +454,22 @@ _map1:
 	.byte	$01
 	.byte	$01
 _map2:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -466,22 +485,6 @@ _map2:
 	.byte	$01
 	.byte	$01
 	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$00
@@ -692,23 +695,13 @@ _map2:
 	.byte	$01
 	.byte	$01
 _map3:
-	.byte	$01
 	.byte	$00
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -720,9 +713,6 @@ _map3:
 	.byte	$00
 	.byte	$01
 	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -733,12 +723,9 @@ _map3:
 	.byte	$01
 	.byte	$01
 	.byte	$01
-	.byte	$00
 	.byte	$01
 	.byte	$01
-	.byte	$00
 	.byte	$01
-	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -759,6 +746,22 @@ _map3:
 	.byte	$01
 	.byte	$01
 	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -820,6 +823,247 @@ _map3:
 	.byte	$01
 	.byte	$00
 	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_map4:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$00
 	.byte	$01
@@ -936,6 +1180,7 @@ _All_Collision_Maps:
 	.addr	_map1
 	.addr	_map2
 	.addr	_map3
+	.addr	_map4
 
 .segment	"BSS"
 
@@ -972,6 +1217,10 @@ _temp_x:
 _temp_y:
 	.res	1,$00
 _i:
+	.res	2,$00
+_roomX:
+	.res	2,$00
+_roomY:
 	.res	2,$00
 _c_map:
 	.res	240,$00
@@ -1154,23 +1403,13 @@ L0006:	lda     _pad1
 	.dbg	line, "game.c", 68
 	dec     _knight+1
 ;
-; health -= 1;
-;
-	.dbg	line, "game.c", 69
-	lda     _health
-	sec
-	sbc     #$01
-	sta     _health
-	bcs     L000A
-	dec     _health+1
-;
 ; else if (pad1 & PAD_DOWN){
 ;
 	.dbg	line, "game.c", 71
-	jmp     L000A
+	jmp     L0009
 L000F:	lda     _pad1
 	and     #$04
-	beq     L000A
+	beq     L0009
 ;
 ; knight.y += 1;
 ;
@@ -1180,26 +1419,26 @@ L000F:	lda     _pad1
 ; bgCollision();
 ;
 	.dbg	line, "game.c", 74
-L000A:	jsr     _bgCollision
+L0009:	jsr     _bgCollision
 ;
 ; if(collision_D) knight.y -= 1;
 ;
 	.dbg	line, "game.c", 75
 	lda     _collision_D
-	beq     L000B
+	beq     L000A
 	dec     _knight+1
 ;
 ; if(collision_U) knight.y += 1;
 ;
 	.dbg	line, "game.c", 76
-L000B:	lda     _collision_U
-	beq     L000C
+L000A:	lda     _collision_U
+	beq     L000B
 	inc     _knight+1
 ;
 ; }
 ;
 	.dbg	line, "game.c", 77
-L000C:	rts
+L000B:	rts
 
 	.dbg	line
 .endproc
@@ -1832,11 +2071,11 @@ L000A:	rts
 	.dbg	line, "game.c", 219
 	inc     _which_bg
 ;
-; if(which_bg >= 3) which_bg = 0;
+; if(which_bg >= 2) which_bg = 0;
 ;
 	.dbg	line, "game.c", 220
 	lda     _which_bg
-	cmp     #$03
+	cmp     #$02
 	bcc     L0003
 	lda     #$00
 	sta     _which_bg
@@ -2036,7 +2275,7 @@ L0003:	rts
 	cpx     #$80
 	bcc     L0002
 ;
-; ppu_off(); // screen off
+; ppu_off(); // screen off //make this better and fade in/out after saying you died
 ;
 	.dbg	line, "game.c", 258
 	jsr     _ppu_off
@@ -2086,6 +2325,137 @@ L0003:	rts
 ;
 	.dbg	line, "game.c", 267
 L0002:	rts
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ testButton (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_testButton: near
+
+	.dbg	func, "testButton", "00", extern, "_testButton"
+
+.segment	"CODE"
+
+;
+; if(pad1_new & PAD_SELECT){
+;
+	.dbg	line, "game.c", 271
+	lda     _pad1_new
+	and     #$20
+	beq     L0002
+;
+; health -= 1;
+;
+	.dbg	line, "game.c", 272
+	lda     _health
+	sec
+	sbc     #$01
+	sta     _health
+	bcs     L0002
+	dec     _health+1
+;
+; }
+;
+	.dbg	line, "game.c", 276
+L0002:	rts
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ nextRoom (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_nextRoom: near
+
+	.dbg	func, "nextRoom", "00", extern, "_nextRoom"
+
+.segment	"CODE"
+
+;
+; if(knight.y < 16){
+;
+	.dbg	line, "game.c", 279
+	lda     _knight+1
+	cmp     #$10
+	bcs     L000D
+;
+; knight.y = 224;
+;
+	.dbg	line, "game.c", 280
+	lda     #$E0
+	sta     _knight+1
+;
+; else if(knight.y > 224){
+;
+	.dbg	line, "game.c", 285
+	jmp     L0015
+L000D:	lda     _knight+1
+	cmp     #$E1
+	bcc     L000E
+;
+; knight.y = 16;
+;
+	.dbg	line, "game.c", 286
+	lda     #$10
+	sta     _knight+1
+;
+; else if(knight.x <= 0 ){
+;
+	.dbg	line, "game.c", 291
+	jmp     L0015
+L000E:	lda     _knight
+	bne     L000F
+;
+; knight.x = 240;
+;
+	.dbg	line, "game.c", 292
+	lda     #$F0
+;
+; else if(knight.x > 240){
+;
+	.dbg	line, "game.c", 297
+	jmp     L0016
+L000F:	lda     _knight
+	cmp     #$F1
+	bcc     L000B
+;
+; knight.x = 1;//can't go less than 0, so have to be a pixel over
+;
+	.dbg	line, "game.c", 298
+	lda     #$01
+L0016:	sta     _knight
+;
+; which_bg++;
+;
+	.dbg	line, "game.c", 299
+L0015:	inc     _which_bg
+;
+; if(which_bg >= 2) which_bg = 0; //temp for testing, currently limits the maps to two rooms that allow exits from all sides
+;
+	.dbg	line, "game.c", 300
+	lda     _which_bg
+	cmp     #$02
+	bcc     L000C
+	lda     #$00
+	sta     _which_bg
+;
+; draw_bg();
+;
+	.dbg	line, "game.c", 301
+L000C:	jmp     _draw_bg
+;
+; }
+;
+	.dbg	line, "game.c", 304
+L000B:	rts
 
 	.dbg	line
 .endproc
@@ -2172,30 +2542,40 @@ L0002:	jsr     _ppu_wait_nmi
 	jsr     _get_pad_new
 	sta     _pad1_new
 ;
-; move();
+; move();//move the player
 ;
 	.dbg	line, "game.c", 44
 	jsr     _move
 ;
 ; testCollision();//sprite collisions
 ;
-	.dbg	line, "game.c", 46
+	.dbg	line, "game.c", 45
 	jsr     _testCollision
 ;
 ; drawSprites();
 ;
-	.dbg	line, "game.c", 47
+	.dbg	line, "game.c", 46
 	jsr     _drawSprites
 ;
 ; check_start();
 ;
-	.dbg	line, "game.c", 48
+	.dbg	line, "game.c", 47
 	jsr     _check_start
+;
+; testButton();//currently select
+;
+	.dbg	line, "game.c", 48
+	jsr     _testButton
 ;
 ; updateHealth();
 ;
-	.dbg	line, "game.c", 50
+	.dbg	line, "game.c", 49
 	jsr     _updateHealth
+;
+; nextRoom();
+;
+	.dbg	line, "game.c", 50
+	jsr     _nextRoom
 ;
 ; loseCheck();
 ;
