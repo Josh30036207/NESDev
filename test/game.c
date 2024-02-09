@@ -19,7 +19,7 @@ void main (void) {
 	// set a starting point on the screen
 	// vram_adr(NTADR_A(x,y));
 	vram_adr(NTADR_A(3,3)); // screen is 32 x 30 tiles
-	
+	clearScreen();
 	set_scroll_y(0xff); //shift the bg down 1 pixel
 	
 	mapPos = center; //setting the mapPos to the center of map
@@ -27,7 +27,7 @@ void main (void) {
 	
 	draw_bg();
 	
-	//ppu_on_all(); //	turn on screen
+	//ppu_on_all(); //	turn on screen now in draw_bg();
 	
 	
 

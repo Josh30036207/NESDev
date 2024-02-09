@@ -39,13 +39,13 @@ const unsigned char fire[]={
 #define BROWN 0x07
 #define PINK 0x25
 
-const unsigned char paletteBg[]={ //palette for the background
+const  char paletteBg[]={ //palette for the background
 BLACK, DK_GY, BLUE, 0x16,
 WHITE,0,0,0,
 0,0,0,0,
 0,0,0,0
 }; 
-const unsigned char paletteSp[]={//palette for the sprites
+const  char paletteSp[]={//palette for the sprites
 PINK, DK_GY, BLUE, BROWN,
 WHITE,0x16,0x19,0x00,
 0,0x26,0x06,0x16,

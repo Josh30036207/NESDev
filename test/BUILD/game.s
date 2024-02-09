@@ -10,10 +10,10 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "game.c", 8471, 1707495053
+	.dbg		file, "game.c", 8485, 1707518425
 	.dbg		file, "LIB/neslib.h", 9196, 1701627949
 	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
-	.dbg		file, "sprites.h", 909, 1707494002
+	.dbg		file, "sprites.h", 893, 1707516383
 	.dbg		file, "game.h", 1963, 1707494934
 	.dbg		file, "BG/maps.c", 8433, 1707483872
 	.forceimport	__STARTUP__
@@ -4637,6 +4637,11 @@ L000B:	rts
 	ldx     #$20
 	lda     #$63
 	jsr     _vram_adr
+;
+; clearScreen();
+;
+	.dbg	line, "game.c", 22
+	jsr     _clearScreen
 ;
 ; set_scroll_y(0xff); //shift the bg down 1 pixel
 ;
