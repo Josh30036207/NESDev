@@ -10,12 +10,12 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "game.c", 7228, 1707359480
+	.dbg		file, "game.c", 8148, 1707487161
 	.dbg		file, "LIB/neslib.h", 9196, 1701627949
 	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
-	.dbg		file, "sprites.h", 819, 1707359340
-	.dbg		file, "game.h", 1702, 1707359754
-	.dbg		file, "BG/maps.c", 5604, 1707359778
+	.dbg		file, "sprites.h", 906, 1707485509
+	.dbg		file, "game.h", 1861, 1707486866
+	.dbg		file, "BG/maps.c", 8433, 1707483872
 	.forceimport	__STARTUP__
 	.dbg		sym, "pal_bg", "00", extern, "_pal_bg"
 	.dbg		sym, "pal_spr", "00", extern, "_pal_spr"
@@ -58,6 +58,7 @@
 	.export		_metasprite
 	.export		_metasprite2
 	.export		_metasprite3
+	.export		_fire
 	.export		_paletteBg
 	.export		_paletteSp
 	.export		_map0
@@ -65,13 +66,20 @@
 	.export		_map2
 	.export		_map3
 	.export		_map4
+	.export		_map5
+	.export		_map6
+	.export		_map7
+	.export		_map8
+	.export		_winRoom
 	.export		_worldMap
+	.export		_center
 	.export		_mapPos
 	.export		_mapWidth
 	.export		_pad1
 	.export		_pad1_new
 	.export		_collision
 	.export		_text
+	.export		_winTxt
 	.export		_collision_L
 	.export		_collision_R
 	.export		_collision_U
@@ -89,11 +97,13 @@
 	.export		_health
 	.export		_maxHealth
 	.export		_iFrame
+	.export		_loop
 	.export		_knight
 	.export		_Enemy
 	.export		_numberOfE
 	.export		_E
 	.export		_tempE
+	.export		_winBlock
 	.export		_c_map
 	.export		_All_Collision_Maps
 	.export		_drawSprites
@@ -108,20 +118,26 @@
 	.export		_testButton
 	.export		_nextRoom
 	.export		_clearScreen
+	.export		_win
+	.export		_loadRoomData
 	.export		_main
 
 .segment	"DATA"
 
-_mapPos:
-	.word	$0005
 _mapWidth:
-	.word	$0004
+	.word	$0005
+_text:
+	.byte	$59,$6F,$75,$20,$44,$69,$65,$64,$00
+_winTxt:
+	.byte	$59,$6F,$75,$20,$57,$69,$6E,$00
 _health:
 	.word	$0008
 _maxHealth:
 	.word	$0008
 _iFrame:
 	.word	$0000
+_loop:
+	.word	$0001
 _knight:
 	.byte	$28
 	.byte	$3E
@@ -134,6 +150,11 @@ _Enemy:
 	.byte	$0F
 _numberOfE:
 	.word	$0003
+_winBlock:
+	.byte	$78
+	.byte	$70
+	.byte	$0F
+	.byte	$07
 
 .segment	"RODATA"
 
@@ -191,6 +212,16 @@ _metasprite3:
 	.byte	$10
 	.byte	$40
 	.byte	$80
+_fire:
+	.byte	$00
+	.byte	$00
+	.byte	$81
+	.byte	$02
+	.byte	$08
+	.byte	$00
+	.byte	$82
+	.byte	$02
+	.byte	$80
 _paletteBg:
 	.byte	$0F
 	.byte	$00
@@ -218,9 +249,9 @@ _paletteSp:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$26
+	.byte	$06
+	.byte	$16
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -242,6 +273,160 @@ _map0:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$02
+	.byte	$02
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$03
+	.byte	$03
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$03
+	.byte	$03
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$03
+	.byte	$03
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$02
+	.byte	$02
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -297,25 +482,8 @@ _map0:
 	.byte	$00
 	.byte	$00
 	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -329,143 +497,6 @@ _map0:
 	.byte	$00
 	.byte	$00
 	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 _map1:
 	.byte	$00
 	.byte	$00
@@ -483,77 +514,22 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
 	.byte	$01
 	.byte	$00
 	.byte	$00
@@ -562,8 +538,8 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
+	.byte	$00
+	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -578,6 +554,85 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
 	.byte	$02
 	.byte	$02
 	.byte	$00
@@ -587,22 +642,6 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$01
 	.byte	$01
 	.byte	$00
 	.byte	$00
@@ -610,8 +649,6 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -620,14 +657,14 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -636,14 +673,14 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -652,14 +689,14 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -668,14 +705,14 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -684,14 +721,14 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -700,13 +737,7 @@ _map1:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
+	.byte	$01
 _map2:
 	.byte	$00
 	.byte	$00
@@ -724,61 +755,6 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$01
 	.byte	$00
 	.byte	$00
@@ -787,24 +763,6 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -813,20 +771,6 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$01
 	.byte	$00
 	.byte	$00
@@ -835,14 +779,29 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
+	.byte	$00
+	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$00
@@ -852,6 +811,22 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$00
 	.byte	$02
 	.byte	$00
 	.byte	$00
@@ -859,39 +834,8 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -900,6 +844,20 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$02
 	.byte	$00
 	.byte	$00
@@ -908,24 +866,8 @@ _map2:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -934,20 +876,109 @@ _map2:
 	.byte	$02
 	.byte	$02
 	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
 _map3:
 	.byte	$00
 	.byte	$00
@@ -965,60 +996,20 @@ _map3:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -1029,6 +1020,38 @@ _map3:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$02
 	.byte	$02
 	.byte	$00
 	.byte	$00
@@ -1051,16 +1074,16 @@ _map3:
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$01
-	.byte	$01
-	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$02
+	.byte	$02
 	.byte	$02
 	.byte	$00
 	.byte	$00
@@ -1069,22 +1092,6 @@ _map3:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$01
-	.byte	$01
 	.byte	$01
 	.byte	$00
 	.byte	$00
@@ -1101,73 +1108,7 @@ _map3:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -1176,19 +1117,109 @@ _map3:
 	.byte	$02
 	.byte	$02
 	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
 _map4:
 	.byte	$00
 	.byte	$00
@@ -1206,92 +1237,18 @@ _map4:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$01
-	.byte	$00
 	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
 	.byte	$01
-	.byte	$00
 	.byte	$01
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
 	.byte	$01
 	.byte	$01
 	.byte	$01
@@ -1301,7 +1258,24 @@ _map4:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -1319,7 +1293,7 @@ _map4:
 	.byte	$00
 	.byte	$02
 	.byte	$00
-	.byte	$00
+	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -1335,12 +1309,30 @@ _map4:
 	.byte	$00
 	.byte	$02
 	.byte	$00
+	.byte	$02
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
 	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$02
+	.byte	$02
+	.byte	$02
+	.byte	$02
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -1356,23 +1348,7 @@ _map4:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -1388,16 +1364,7 @@ _map4:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$00
-	.byte	$02
+	.byte	$01
 	.byte	$00
 	.byte	$00
 	.byte	$00
@@ -1413,47 +1380,1331 @@ _map4:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
-	.byte	$02
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_map5:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_map6:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+_map7:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_map8:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+_winRoom:
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
+	.byte	$01
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$00
+	.byte	$01
 _worldMap:
 	.byte	$00
 	.byte	$01
 	.byte	$01
 	.byte	$00
+	.byte	$09
 	.byte	$03
 	.byte	$00
 	.byte	$00
 	.byte	$04
+	.byte	$06
+	.byte	$00
+	.byte	$08
+	.byte	$00
+	.byte	$05
+	.byte	$07
+	.byte	$00
 	.byte	$00
 	.byte	$02
-	.byte	$02
 	.byte	$00
-_text:
-	.byte	$59,$6F,$75,$20,$44,$69,$65,$64,$00
+	.byte	$00
+_center:
+	.word	$000C
 _All_Collision_Maps:
 	.addr	_map0
 	.addr	_map1
 	.addr	_map2
 	.addr	_map3
 	.addr	_map4
+	.addr	_map5
+	.addr	_map6
+	.addr	_map7
+	.addr	_map8
+	.addr	_winRoom
 
 .segment	"BSS"
 
+_mapPos:
+	.res	2,$00
 _pad1:
 	.res	1,$00
 _pad1_new:
@@ -1510,23 +2761,23 @@ _c_map:
 ;
 ; ppu_wait_nmi(); // wait till beginning of the frame
 ;
-	.dbg	line, "game.c", 77
+	.dbg	line, "game.c", 83
 	jsr     _ppu_wait_nmi
 ;
 ; oam_clear();
 ;
-	.dbg	line, "game.c", 79
+	.dbg	line, "game.c", 85
 	jsr     _oam_clear
 ;
 ; bank_spr(1);//switch to player spritesheet
 ;
-	.dbg	line, "game.c", 80
+	.dbg	line, "game.c", 86
 	lda     #$01
 	jsr     _bank_spr
 ;
 ; oam_meta_spr(knight.x, knight.y, metasprite);
 ;
-	.dbg	line, "game.c", 83
+	.dbg	line, "game.c", 89
 	jsr     decsp2
 	lda     _knight
 	ldy     #$01
@@ -1538,23 +2789,44 @@ _c_map:
 	ldx     #>(_metasprite)
 	jsr     _oam_meta_spr
 ;
+; if(which_bg == 9){
+;
+	.dbg	line, "game.c", 92
+	lda     _which_bg
+	cmp     #$09
+	bne     L000A
+;
+; oam_meta_spr(winBlock.x, winBlock.y , fire);
+;
+	.dbg	line, "game.c", 93
+	jsr     decsp2
+	lda     _winBlock
+	ldy     #$01
+	sta     (sp),y
+	lda     _winBlock+1
+	dey
+	sta     (sp),y
+	lda     #<(_fire)
+	ldx     #>(_fire)
+	jmp     _oam_meta_spr
+;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 87
-	lda     #$00
+	.dbg	line, "game.c", 95
+L000A:	lda     #$00
 	sta     _i
 	sta     _i+1
-L0002:	lda     _i
+L0004:	lda     _i
 	cmp     _numberOfE
 	lda     _i+1
 	sbc     _numberOfE+1
-	bvc     L0007
+	bvc     L0009
 	eor     #$80
-L0007:	bpl     L0003
+L0009:	bpl     L0005
 ;
 ; oam_meta_spr(E[i].x, E[i].y , metasprite2);
 ;
-	.dbg	line, "game.c", 88
+	.dbg	line, "game.c", 96
 	jsr     decsp2
 	lda     _i
 	ldx     _i+1
@@ -1586,16 +2858,16 @@ L0007:	bpl     L0003
 ;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 87
+	.dbg	line, "game.c", 95
 	inc     _i
-	bne     L0002
+	bne     L0004
 	inc     _i+1
-	jmp     L0002
+	jmp     L0004
 ;
 ; }
 ;
-	.dbg	line, "game.c", 91
-L0003:	rts
+	.dbg	line, "game.c", 100
+L0005:	rts
 
 	.dbg	line
 .endproc
@@ -1615,95 +2887,117 @@ L0003:	rts
 ;
 ; if(pad1 & PAD_LEFT){
 ;
-	.dbg	line, "game.c", 54
+	.dbg	line, "game.c", 60
 	lda     _pad1
 	and     #$02
 	beq     L000E
 ;
-; knight.x -= 1;
+; knight.x -= 2;
 ;
-	.dbg	line, "game.c", 55
-	dec     _knight
+	.dbg	line, "game.c", 61
+	lda     _knight
+	sec
+	sbc     #$02
 ;
 ; else if (pad1 & PAD_RIGHT){
 ;
-	.dbg	line, "game.c", 57
-	jmp     L0004
+	.dbg	line, "game.c", 63
+	jmp     L000C
 L000E:	lda     _pad1
 	and     #$01
 	beq     L0004
 ;
-; knight.x += 1;
+; knight.x += 2;
 ;
-	.dbg	line, "game.c", 58
-	inc     _knight
+	.dbg	line, "game.c", 64
+	lda     #$02
+	clc
+	adc     _knight
+L000C:	sta     _knight
 ;
 ; bgCollision();
 ;
-	.dbg	line, "game.c", 61
+	.dbg	line, "game.c", 67
 L0004:	jsr     _bgCollision
 ;
-; if(collision_R) knight.x -= 1;
+; if(collision_R) knight.x -= 2;
 ;
-	.dbg	line, "game.c", 62
+	.dbg	line, "game.c", 68
 	lda     _collision_R
 	beq     L0005
-	dec     _knight
+	lda     _knight
+	sec
+	sbc     #$02
+	sta     _knight
 ;
-; if(collision_L) knight.x += 1;
+; if(collision_L) knight.x += 2;
 ;
-	.dbg	line, "game.c", 63
+	.dbg	line, "game.c", 69
 L0005:	lda     _collision_L
 	beq     L0006
-	inc     _knight
+	lda     #$02
+	clc
+	adc     _knight
+	sta     _knight
 ;
 ; if(pad1 & PAD_UP){
 ;
-	.dbg	line, "game.c", 64
+	.dbg	line, "game.c", 70
 L0006:	lda     _pad1
 	and     #$08
 	beq     L000F
 ;
-; knight.y -= 1;
+; knight.y -= 2;
 ;
-	.dbg	line, "game.c", 65
-	dec     _knight+1
+	.dbg	line, "game.c", 71
+	lda     _knight+1
+	sec
+	sbc     #$02
 ;
 ; else if (pad1 & PAD_DOWN){
 ;
-	.dbg	line, "game.c", 68
-	jmp     L0009
+	.dbg	line, "game.c", 74
+	jmp     L000D
 L000F:	lda     _pad1
 	and     #$04
 	beq     L0009
 ;
-; knight.y += 1;
+; knight.y += 2;
 ;
-	.dbg	line, "game.c", 69
-	inc     _knight+1
+	.dbg	line, "game.c", 75
+	lda     #$02
+	clc
+	adc     _knight+1
+L000D:	sta     _knight+1
 ;
 ; bgCollision();
 ;
-	.dbg	line, "game.c", 71
+	.dbg	line, "game.c", 77
 L0009:	jsr     _bgCollision
 ;
-; if(collision_D) knight.y -= 1;
+; if(collision_D) knight.y -= 2;
 ;
-	.dbg	line, "game.c", 72
+	.dbg	line, "game.c", 78
 	lda     _collision_D
 	beq     L000A
-	dec     _knight+1
+	lda     _knight+1
+	sec
+	sbc     #$02
+	sta     _knight+1
 ;
-; if(collision_U) knight.y += 1;
+; if(collision_U) knight.y += 2;
 ;
-	.dbg	line, "game.c", 73
+	.dbg	line, "game.c", 79
 L000A:	lda     _collision_U
 	beq     L000B
-	inc     _knight+1
+	lda     #$02
+	clc
+	adc     _knight+1
+	sta     _knight+1
 ;
 ; }
 ;
-	.dbg	line, "game.c", 74
+	.dbg	line, "game.c", 80
 L000B:	rts
 
 	.dbg	line
@@ -1724,7 +3018,7 @@ L000B:	rts
 ;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 94
+	.dbg	line, "game.c", 103
 	lda     #$00
 	sta     _i
 	sta     _i+1
@@ -1732,13 +3026,13 @@ L0002:	lda     _i
 	cmp     _numberOfE
 	lda     _i+1
 	sbc     _numberOfE+1
-	bvc     L0008
+	bvc     L000D
 	eor     #$80
-L0008:	bpl     L0003
+L000D:	bpl     L000E
 ;
 ; collision = check_collision(&knight, &E[i]); 
 ;
-	.dbg	line, "game.c", 95
+	.dbg	line, "game.c", 104
 	lda     #<(_knight)
 	ldx     #>(_knight)
 	jsr     pushax
@@ -1757,13 +3051,13 @@ L0008:	bpl     L0003
 ;
 ; if (collision){
 ;
-	.dbg	line, "game.c", 97
+	.dbg	line, "game.c", 106
 	lda     _collision
 	beq     L0004
 ;
 ; E[i].y++;
 ;
-	.dbg	line, "game.c", 98
+	.dbg	line, "game.c", 107
 	lda     _i
 	ldx     _i+1
 	jsr     aslax2
@@ -1784,18 +3078,72 @@ L0008:	bpl     L0003
 	adc     #$01
 	sta     (sreg),y
 ;
+; if (iFrame <= 0){
+;
+	.dbg	line, "game.c", 108
+	lda     _iFrame
+	cmp     #$01
+	lda     _iFrame+1
+	sbc     #$00
+	bvc     L0009
+	eor     #$80
+L0009:	bpl     L0004
+;
+; health -= 1;
+;
+	.dbg	line, "game.c", 109
+	lda     _health
+	sec
+	sbc     #$01
+	sta     _health
+	bcs     L000A
+	dec     _health+1
+;
+; iFrame = 26;
+;
+	.dbg	line, "game.c", 110
+L000A:	ldx     #$00
+	lda     #$1A
+	sta     _iFrame
+	stx     _iFrame+1
+;
 ; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 94
+	.dbg	line, "game.c", 103
 L0004:	inc     _i
-	bne     L0002
+	jne     L0002
 	inc     _i+1
 	jmp     L0002
 ;
+; if(which_bg == 9){
+;
+	.dbg	line, "game.c", 116
+L000E:	lda     _which_bg
+	cmp     #$09
+	bne     L000C
+;
+; collision = check_collision(&knight, &winBlock);
+;
+	.dbg	line, "game.c", 117
+	lda     #<(_knight)
+	ldx     #>(_knight)
+	jsr     pushax
+	lda     #<(_winBlock)
+	ldx     #>(_winBlock)
+	jsr     _check_collision
+	sta     _collision
+;
+; if (collision){win();}}
+;
+	.dbg	line, "game.c", 118
+	lda     _collision
+	beq     L000C
+	jmp     _win
+;
 ; }
 ;
-	.dbg	line, "game.c", 102
-L0003:	rts
+	.dbg	line, "game.c", 119
+L000C:	rts
 
 	.dbg	line
 .endproc
@@ -1815,12 +3163,12 @@ L0003:	rts
 ;
 ; ppu_off(); // screen off
 ;
-	.dbg	line, "game.c", 105
+	.dbg	line, "game.c", 122
 	jsr     _ppu_off
 ;
 ; p_maps = All_Collision_Maps[which_bg];
 ;
-	.dbg	line, "game.c", 107
+	.dbg	line, "game.c", 124
 	ldx     #$00
 	lda     _which_bg
 	asl     a
@@ -1841,7 +3189,7 @@ L0025:	adc     #<(_All_Collision_Maps)
 ;
 ; memcpy (c_map, p_maps, 240);
 ;
-	.dbg	line, "game.c", 109
+	.dbg	line, "game.c", 126
 	lda     #<(_c_map)
 	ldx     #>(_c_map)
 	jsr     pushax
@@ -1854,14 +3202,14 @@ L0025:	adc     #<(_All_Collision_Maps)
 ;
 ; vram_adr(NAMETABLE_A);
 ;
-	.dbg	line, "game.c", 112
+	.dbg	line, "game.c", 129
 	ldx     #$20
 	lda     #$00
 	jsr     _vram_adr
 ;
 ; for(temp_y = 0; temp_y < 15; ++temp_y){
 ;
-	.dbg	line, "game.c", 116
+	.dbg	line, "game.c", 133
 	lda     #$00
 	sta     _temp_y
 L0026:	lda     _temp_y
@@ -1870,7 +3218,7 @@ L0026:	lda     _temp_y
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 117
+	.dbg	line, "game.c", 134
 	lda     #$00
 	sta     _temp_x
 L0027:	lda     _temp_x
@@ -1879,7 +3227,7 @@ L0027:	lda     _temp_x
 ;
 ; temp1 = (temp_y << 4) + temp_x;
 ;
-	.dbg	line, "game.c", 118
+	.dbg	line, "game.c", 135
 	lda     _temp_y
 	asl     a
 	asl     a
@@ -1891,7 +3239,7 @@ L0027:	lda     _temp_x
 ;
 ; if(c_map[temp1] == 1){
 ;
-	.dbg	line, "game.c", 120
+	.dbg	line, "game.c", 137
 	ldy     _temp1
 	lda     _c_map,y
 	cmp     #$01
@@ -1899,18 +3247,18 @@ L0027:	lda     _temp_x
 ;
 ; vram_put(0x02); // wall
 ;
-	.dbg	line, "game.c", 121
+	.dbg	line, "game.c", 138
 	lda     #$02
 	jsr     _vram_put
 ;
 ; vram_put(0x02);
 ;
-	.dbg	line, "game.c", 122
+	.dbg	line, "game.c", 139
 	lda     #$02
 ;
 ; else if(c_map[temp1] == 2){
 ;
-	.dbg	line, "game.c", 124
+	.dbg	line, "game.c", 141
 	jmp     L0023
 L000A:	ldy     _temp1
 	lda     _c_map,y
@@ -1919,18 +3267,18 @@ L000A:	ldy     _temp1
 ;
 ; vram_put(0x03); // Pink
 ;
-	.dbg	line, "game.c", 125
+	.dbg	line, "game.c", 142
 	lda     #$03
 	jsr     _vram_put
 ;
 ; vram_put(0x03);
 ;
-	.dbg	line, "game.c", 126
+	.dbg	line, "game.c", 143
 	lda     #$03
 ;
 ; else if(c_map[temp1] == 3){
 ;
-	.dbg	line, "game.c", 128
+	.dbg	line, "game.c", 145
 	jmp     L0023
 L000D:	ldy     _temp1
 	lda     _c_map,y
@@ -1939,41 +3287,41 @@ L000D:	ldy     _temp1
 ;
 ; vram_put(0x07); // Heart 
 ;
-	.dbg	line, "game.c", 129
+	.dbg	line, "game.c", 146
 	lda     #$07
 	jsr     _vram_put
 ;
 ; vram_put(0x08); // Heart 
 ;
-	.dbg	line, "game.c", 130
+	.dbg	line, "game.c", 147
 	lda     #$08
 ;
 ; else{
 ;
-	.dbg	line, "game.c", 132
+	.dbg	line, "game.c", 149
 	jmp     L0023
 ;
 ; vram_put(0); // blank
 ;
-	.dbg	line, "game.c", 133
+	.dbg	line, "game.c", 150
 L0028:	lda     #$00
 	jsr     _vram_put
 ;
 ; vram_put(0);
 ;
-	.dbg	line, "game.c", 134
+	.dbg	line, "game.c", 151
 	lda     #$00
 L0023:	jsr     _vram_put
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 117
+	.dbg	line, "game.c", 134
 	inc     _temp_x
 	jmp     L0027
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 139
+	.dbg	line, "game.c", 156
 L0029:	lda     #$00
 	sta     _temp_x
 L002A:	lda     _temp_x
@@ -1982,7 +3330,7 @@ L002A:	lda     _temp_x
 ;
 ; temp1 = (temp_y << 4) + temp_x;
 ;
-	.dbg	line, "game.c", 140
+	.dbg	line, "game.c", 157
 	lda     _temp_y
 	asl     a
 	asl     a
@@ -1994,7 +3342,7 @@ L002A:	lda     _temp_x
 ;
 ; if(c_map[temp1] == 1){
 ;
-	.dbg	line, "game.c", 142
+	.dbg	line, "game.c", 159
 	ldy     _temp1
 	lda     _c_map,y
 	cmp     #$01
@@ -2002,18 +3350,18 @@ L002A:	lda     _temp_x
 ;
 ; vram_put(0x02); // wall
 ;
-	.dbg	line, "game.c", 143
+	.dbg	line, "game.c", 160
 	lda     #$02
 	jsr     _vram_put
 ;
 ; vram_put(0x02);
 ;
-	.dbg	line, "game.c", 144
+	.dbg	line, "game.c", 161
 	lda     #$02
 ;
 ; else if(c_map[temp1] == 2){
 ;
-	.dbg	line, "game.c", 146
+	.dbg	line, "game.c", 163
 	jmp     L0024
 L0017:	ldy     _temp1
 	lda     _c_map,y
@@ -2022,18 +3370,18 @@ L0017:	ldy     _temp1
 ;
 ; vram_put(0x03); // Pink
 ;
-	.dbg	line, "game.c", 147
+	.dbg	line, "game.c", 164
 	lda     #$03
 	jsr     _vram_put
 ;
 ; vram_put(0x03);
 ;
-	.dbg	line, "game.c", 148
+	.dbg	line, "game.c", 165
 	lda     #$03
 ;
 ; else if(c_map[temp1] == 3){
 ;
-	.dbg	line, "game.c", 150
+	.dbg	line, "game.c", 167
 	jmp     L0024
 L001A:	ldy     _temp1
 	lda     _c_map,y
@@ -2042,52 +3390,52 @@ L001A:	ldy     _temp1
 ;
 ; vram_put(0x17); // Heart 
 ;
-	.dbg	line, "game.c", 151
+	.dbg	line, "game.c", 168
 	lda     #$17
 	jsr     _vram_put
 ;
 ; vram_put(0x18);
 ;
-	.dbg	line, "game.c", 152
+	.dbg	line, "game.c", 169
 	lda     #$18
 ;
 ; else{
 ;
-	.dbg	line, "game.c", 154
+	.dbg	line, "game.c", 171
 	jmp     L0024
 ;
 ; vram_put(0); // blank
 ;
-	.dbg	line, "game.c", 155
+	.dbg	line, "game.c", 172
 L002B:	lda     #$00
 	jsr     _vram_put
 ;
 ; vram_put(0);
 ;
-	.dbg	line, "game.c", 156
+	.dbg	line, "game.c", 173
 	lda     #$00
 L0024:	jsr     _vram_put
 ;
 ; for(temp_x = 0; temp_x < 16; ++temp_x){
 ;
-	.dbg	line, "game.c", 139
+	.dbg	line, "game.c", 156
 	inc     _temp_x
 	jmp     L002A
 ;
 ; for(temp_y = 0; temp_y < 15; ++temp_y){
 ;
-	.dbg	line, "game.c", 116
+	.dbg	line, "game.c", 133
 L002C:	inc     _temp_y
 	jmp     L0026
 ;
 ; loadEnemyData();
 ;
-	.dbg	line, "game.c", 160
+	.dbg	line, "game.c", 177
 L0003:	jsr     _loadEnemyData
 ;
 ; ppu_on_all(); // turn on screen
 ;
-	.dbg	line, "game.c", 162
+	.dbg	line, "game.c", 179
 	jmp     _ppu_on_all
 
 	.dbg	line
@@ -2108,51 +3456,51 @@ L0003:	jsr     _loadEnemyData
 ;
 ; collision_L = 0;
 ;
-	.dbg	line, "game.c", 168
+	.dbg	line, "game.c", 185
 	lda     #$00
 	sta     _collision_L
 ;
 ; collision_R = 0;
 ;
-	.dbg	line, "game.c", 169
+	.dbg	line, "game.c", 186
 	sta     _collision_R
 ;
 ; collision_U = 0;
 ;
-	.dbg	line, "game.c", 170
+	.dbg	line, "game.c", 187
 	sta     _collision_U
 ;
 ; collision_D = 0;
 ;
-	.dbg	line, "game.c", 171
+	.dbg	line, "game.c", 188
 	sta     _collision_D
 ;
 ; temp_x = knight.x; // left side
 ;
-	.dbg	line, "game.c", 173
+	.dbg	line, "game.c", 190
 	lda     _knight
 	sta     _temp_x
 ;
 ; temp_y = knight.y; // top side
 ;
-	.dbg	line, "game.c", 174
+	.dbg	line, "game.c", 191
 	lda     _knight+1
 	sta     _temp_y
 ;
 ; if(temp_y >= 0xf0) return;
 ;
-	.dbg	line, "game.c", 176
+	.dbg	line, "game.c", 193
 	cmp     #$F0
 	bcc     L0015
 ;
 ; }
 ;
-	.dbg	line, "game.c", 210
+	.dbg	line, "game.c", 227
 	rts
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper left
 ;
-	.dbg	line, "game.c", 179
+	.dbg	line, "game.c", 196
 L0015:	lda     _temp_x
 	lsr     a
 	lsr     a
@@ -2167,24 +3515,24 @@ L0015:	lda     _temp_x
 ;
 ; if(c_map[coordinates]){ // find a corner in the collision map
 ;
-	.dbg	line, "game.c", 180
+	.dbg	line, "game.c", 197
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L0012
 ;
 ; ++collision_L;
 ;
-	.dbg	line, "game.c", 181
+	.dbg	line, "game.c", 198
 	inc     _collision_L
 ;
 ; ++collision_U;
 ;
-	.dbg	line, "game.c", 182
+	.dbg	line, "game.c", 199
 	inc     _collision_U
 ;
 ; temp_x = knight.x + knight.width; // right side
 ;
-	.dbg	line, "game.c", 185
+	.dbg	line, "game.c", 202
 L0012:	lda     _knight
 	clc
 	adc     _knight+2
@@ -2192,7 +3540,7 @@ L0012:	lda     _knight
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper right
 ;
-	.dbg	line, "game.c", 187
+	.dbg	line, "game.c", 204
 	lsr     a
 	lsr     a
 	lsr     a
@@ -2206,24 +3554,24 @@ L0012:	lda     _knight
 ;
 ; if(c_map[coordinates]){
 ;
-	.dbg	line, "game.c", 188
+	.dbg	line, "game.c", 205
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L0013
 ;
 ; ++collision_R;
 ;
-	.dbg	line, "game.c", 189
+	.dbg	line, "game.c", 206
 	inc     _collision_R
 ;
 ; ++collision_U;
 ;
-	.dbg	line, "game.c", 190
+	.dbg	line, "game.c", 207
 	inc     _collision_U
 ;
 ; temp_y = knight.y + knight.height; // bottom side
 ;
-	.dbg	line, "game.c", 193
+	.dbg	line, "game.c", 210
 L0013:	lda     _knight+1
 	clc
 	adc     _knight+3
@@ -2231,13 +3579,13 @@ L0013:	lda     _knight+1
 ;
 ; if(temp_y >= 0xf0) return;
 ;
-	.dbg	line, "game.c", 194
+	.dbg	line, "game.c", 211
 	cmp     #$F0
 	bcs     L000A
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom right
 ;
-	.dbg	line, "game.c", 197
+	.dbg	line, "game.c", 214
 	lda     _temp_x
 	lsr     a
 	lsr     a
@@ -2252,30 +3600,30 @@ L0013:	lda     _knight+1
 ;
 ; if(c_map[coordinates]){
 ;
-	.dbg	line, "game.c", 198
+	.dbg	line, "game.c", 215
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L0014
 ;
 ; ++collision_R;
 ;
-	.dbg	line, "game.c", 199
+	.dbg	line, "game.c", 216
 	inc     _collision_R
 ;
 ; ++collision_D;
 ;
-	.dbg	line, "game.c", 200
+	.dbg	line, "game.c", 217
 	inc     _collision_D
 ;
 ; temp_x = knight.x; // left side
 ;
-	.dbg	line, "game.c", 203
+	.dbg	line, "game.c", 220
 L0014:	lda     _knight
 	sta     _temp_x
 ;
 ; coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom left
 ;
-	.dbg	line, "game.c", 205
+	.dbg	line, "game.c", 222
 	lsr     a
 	lsr     a
 	lsr     a
@@ -2289,24 +3637,24 @@ L0014:	lda     _knight
 ;
 ; if(c_map[coordinates]){
 ;
-	.dbg	line, "game.c", 206
+	.dbg	line, "game.c", 223
 	ldy     _coordinates
 	lda     _c_map,y
 	beq     L000A
 ;
 ; ++collision_L;
 ;
-	.dbg	line, "game.c", 207
+	.dbg	line, "game.c", 224
 	inc     _collision_L
 ;
 ; ++collision_D;
 ;
-	.dbg	line, "game.c", 208
+	.dbg	line, "game.c", 225
 	inc     _collision_D
 ;
 ; }
 ;
-	.dbg	line, "game.c", 210
+	.dbg	line, "game.c", 227
 L000A:	rts
 
 	.dbg	line
@@ -2327,19 +3675,19 @@ L000A:	rts
 ;
 ; if(pad1_new & PAD_START){
 ;
-	.dbg	line, "game.c", 214
+	.dbg	line, "game.c", 231
 	lda     _pad1_new
 	and     #$10
 	beq     L0002
 ;
 ; ++which_bg;
 ;
-	.dbg	line, "game.c", 215
+	.dbg	line, "game.c", 232
 	inc     _which_bg
 ;
 ; if(which_bg >= 2) which_bg = 0;
 ;
-	.dbg	line, "game.c", 216
+	.dbg	line, "game.c", 233
 	lda     _which_bg
 	cmp     #$02
 	bcc     L0003
@@ -2348,12 +3696,12 @@ L000A:	rts
 ;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 217
+	.dbg	line, "game.c", 234
 L0003:	jmp     _draw_bg
 ;
 ; }
 ;
-	.dbg	line, "game.c", 219
+	.dbg	line, "game.c", 236
 L0002:	rts
 
 	.dbg	line
@@ -2374,74 +3722,82 @@ L0002:	rts
 ;
 ; E[0].x = 64;
 ;
-	.dbg	line, "game.c", 222
+	.dbg	line, "game.c", 239
 	lda     #$40
 	sta     _E
 ;
 ; E[0].y = 64;
 ;
-	.dbg	line, "game.c", 223
+	.dbg	line, "game.c", 240
 	sta     _E+1
 ;
 ; E[0].width = 15;
 ;
-	.dbg	line, "game.c", 224
+	.dbg	line, "game.c", 241
 	lda     #$0F
 	sta     _E+2
 ;
 ; E[0].height = 15;
 ;
-	.dbg	line, "game.c", 225
+	.dbg	line, "game.c", 242
 	sta     _E+3
 ;
 ; E[1].x = 128;
 ;
-	.dbg	line, "game.c", 227
+	.dbg	line, "game.c", 244
 	lda     #$80
 	sta     _E+4
 ;
 ; E[1].y = 128;
 ;
-	.dbg	line, "game.c", 228
+	.dbg	line, "game.c", 245
 	sta     _E+5
 ;
 ; E[1].width = 15;
 ;
-	.dbg	line, "game.c", 229
+	.dbg	line, "game.c", 246
 	lda     #$0F
 	sta     _E+6
 ;
 ; E[1].height = 15;
 ;
-	.dbg	line, "game.c", 230
+	.dbg	line, "game.c", 247
 	sta     _E+7
 ;
 ; E[2].x = 420;
 ;
-	.dbg	line, "game.c", 232
+	.dbg	line, "game.c", 249
 	lda     #$A4
 	sta     _E+8
 ;
 ; E[2].y = 64;
 ;
-	.dbg	line, "game.c", 233
+	.dbg	line, "game.c", 250
 	lda     #$40
 	sta     _E+9
 ;
 ; E[2].width = 15;
 ;
-	.dbg	line, "game.c", 234
+	.dbg	line, "game.c", 251
 	lda     #$0F
 	sta     _E+10
 ;
 ; E[2].height = 15;
 ;
-	.dbg	line, "game.c", 235
+	.dbg	line, "game.c", 252
 	sta     _E+11
+;
+; numberOfE = 3;
+;
+	.dbg	line, "game.c", 256
+	ldx     #$00
+	lda     #$03
+	sta     _numberOfE
+	stx     _numberOfE+1
 ;
 ; }
 ;
-	.dbg	line, "game.c", 242
+	.dbg	line, "game.c", 259
 	rts
 
 	.dbg	line
@@ -2462,7 +3818,7 @@ L0002:	rts
 ;
 ; for(i = 0; i < health; i++){
 ;
-	.dbg	line, "game.c", 245
+	.dbg	line, "game.c", 262
 	lda     #$00
 	sta     _i
 	sta     _i+1
@@ -2476,7 +3832,7 @@ L0007:	bpl     L0003
 ;
 ; oam_spr((i*8), 0, 0x80, 1);
 ;
-	.dbg	line, "game.c", 246
+	.dbg	line, "game.c", 263
 	jsr     decsp3
 	lda     _i
 	asl     a
@@ -2495,7 +3851,7 @@ L0007:	bpl     L0003
 ;
 ; for(i = 0; i < health; i++){
 ;
-	.dbg	line, "game.c", 245
+	.dbg	line, "game.c", 262
 	inc     _i
 	bne     L0002
 	inc     _i+1
@@ -2503,7 +3859,7 @@ L0007:	bpl     L0003
 ;
 ; }
 ;
-	.dbg	line, "game.c", 249
+	.dbg	line, "game.c", 266
 L0003:	rts
 
 	.dbg	line
@@ -2524,43 +3880,48 @@ L0003:	rts
 ;
 ; if(health <= 0){
 ;
-	.dbg	line, "game.c", 263
+	.dbg	line, "game.c", 280
 	lda     _health
 	cmp     #$01
 	lda     _health+1
 	sbc     #$00
 	bvc     L0003
 	eor     #$80
-L0003:	bpl     L0002
+L0003:	bmi     L0009
+;
+; }
+;
+	.dbg	line, "game.c", 314
+	rts
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 265
-	lda     #$04
+	.dbg	line, "game.c", 282
+L0009:	lda     #$04
 	jsr     pusha
 	lda     #$00
 	jsr     _pal_fade_to
 ;
 ; oam_clear();//clear sprite buffer
 ;
-	.dbg	line, "game.c", 269
+	.dbg	line, "game.c", 286
 	jsr     _oam_clear
 ;
 ; clearScreen();
 ;
-	.dbg	line, "game.c", 270
+	.dbg	line, "game.c", 287
 	jsr     _clearScreen
 ;
 ; vram_adr(NTADR_A(12,14)); // screen is 32 x 30 tiles
 ;
-	.dbg	line, "game.c", 271
+	.dbg	line, "game.c", 288
 	ldx     #$21
 	lda     #$CC
 	jsr     _vram_adr
 ;
 ; vram_write(text,sizeof(text));
 ;
-	.dbg	line, "game.c", 272
+	.dbg	line, "game.c", 289
 	lda     #<(_text)
 	ldx     #>(_text)
 	jsr     pushax
@@ -2570,32 +3931,32 @@ L0003:	bpl     L0002
 ;
 ; pal_bright(4); // back to normal brightness 
 ;
-	.dbg	line, "game.c", 273
+	.dbg	line, "game.c", 290
 	lda     #$04
 	jsr     _pal_bright
 ;
 ; i = 0;
 ;
-	.dbg	line, "game.c", 274
+	.dbg	line, "game.c", 291
 	lda     #$00
 	sta     _i
 	sta     _i+1
 ;
 ; ppu_wait_nmi();
 ;
-	.dbg	line, "game.c", 276
+	.dbg	line, "game.c", 293
 L0004:	jsr     _ppu_wait_nmi
 ;
 ; i++;
 ;
-	.dbg	line, "game.c", 277
+	.dbg	line, "game.c", 294
 	inc     _i
 	bne     L0007
 	inc     _i+1
 ;
 ; }while(i <= 180);
 ;
-	.dbg	line, "game.c", 278
+	.dbg	line, "game.c", 295
 L0007:	lda     _i
 	cmp     #$B5
 	lda     _i+1
@@ -2606,7 +3967,7 @@ L0008:	bmi     L0004
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 283
+	.dbg	line, "game.c", 300
 	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -2614,53 +3975,68 @@ L0008:	bmi     L0004
 ;
 ; ppu_off(); // screen off //make this better and fade in/out after saying you died
 ;
-	.dbg	line, "game.c", 284
+	.dbg	line, "game.c", 301
 	jsr     _ppu_off
 ;
 ; clearScreen();
 ;
-	.dbg	line, "game.c", 285
+	.dbg	line, "game.c", 302
 	jsr     _clearScreen
 ;
 ; which_bg = 0;
 ;
-	.dbg	line, "game.c", 286
+	.dbg	line, "game.c", 303
 	lda     #$00
 	sta     _which_bg
 ;
+; mapPos = center;
+;
+	.dbg	line, "game.c", 304
+	lda     _center+1
+	sta     _mapPos+1
+	lda     _center
+	sta     _mapPos
+;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 287
+	.dbg	line, "game.c", 305
 	jsr     _draw_bg
 ;
 ; health = maxHealth;
 ;
-	.dbg	line, "game.c", 288
+	.dbg	line, "game.c", 306
 	lda     _maxHealth+1
 	sta     _health+1
 	lda     _maxHealth
 	sta     _health
 ;
+; knight.x = 120;
+;
+	.dbg	line, "game.c", 307
+	lda     #$78
+	sta     _knight
+;
+; knight.y = 112;
+;
+	.dbg	line, "game.c", 308
+	lda     #$70
+	sta     _knight+1
+;
 ; ppu_wait_nmi();
 ;
-	.dbg	line, "game.c", 291
+	.dbg	line, "game.c", 309
 	jsr     _ppu_wait_nmi
 ;
 ; ppu_on_all();
 ;
-	.dbg	line, "game.c", 292
+	.dbg	line, "game.c", 310
 	jsr     _ppu_on_all
 ;
 ; pal_bright(4); // back to normal brightness 
 ;
-	.dbg	line, "game.c", 293
+	.dbg	line, "game.c", 311
 	lda     #$04
 	jmp     _pal_bright
-;
-; }
-;
-	.dbg	line, "game.c", 296
-L0002:	rts
 
 	.dbg	line
 .endproc
@@ -2680,14 +4056,14 @@ L0002:	rts
 ;
 ; if(pad1_new & PAD_SELECT){
 ;
-	.dbg	line, "game.c", 300
+	.dbg	line, "game.c", 318
 	lda     _pad1_new
 	and     #$20
 	beq     L0002
 ;
 ; health -= 1;
 ;
-	.dbg	line, "game.c", 301
+	.dbg	line, "game.c", 319
 	lda     _health
 	sec
 	sbc     #$01
@@ -2697,7 +4073,7 @@ L0002:	rts
 ;
 ; }
 ;
-	.dbg	line, "game.c", 305
+	.dbg	line, "game.c", 323
 L0002:	rts
 
 	.dbg	line
@@ -2716,30 +4092,30 @@ L0002:	rts
 .segment	"CODE"
 
 ;
-; if(knight.y < 16){
+; if(knight.y < 13){
 ;
-	.dbg	line, "game.c", 308
+	.dbg	line, "game.c", 326
 	lda     _knight+1
-	cmp     #$10
+	cmp     #$0D
 	bcs     L000C
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 309
+	.dbg	line, "game.c", 327
 	lda     #$04
 	jsr     pusha
 	lda     #$00
 	jsr     _pal_fade_to
 ;
-; knight.y = 224;
+; knight.y = 221;
 ;
-	.dbg	line, "game.c", 310
-	lda     #$E0
+	.dbg	line, "game.c", 328
+	lda     #$DD
 	sta     _knight+1
 ;
 ; mapPos -= mapWidth;
 ;
-	.dbg	line, "game.c", 311
+	.dbg	line, "game.c", 329
 	lda     _mapWidth
 	eor     #$FF
 	sec
@@ -2752,34 +4128,34 @@ L0002:	rts
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 312
+	.dbg	line, "game.c", 330
 	lda     _mapPos
 ;
-; else if(knight.y > 224){
+; else if(knight.y > 221){
 ;
-	.dbg	line, "game.c", 318
-	jmp     L001A
+	.dbg	line, "game.c", 337
+	jmp     L001B
 L000C:	lda     _knight+1
-	cmp     #$E1
+	cmp     #$DE
 	bcc     L000D
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 319
+	.dbg	line, "game.c", 338
 	lda     #$04
 	jsr     pusha
 	lda     #$00
 	jsr     _pal_fade_to
 ;
-; knight.y = 16;
+; knight.y = 13;
 ;
-	.dbg	line, "game.c", 320
-	lda     #$10
+	.dbg	line, "game.c", 339
+	lda     #$0D
 	sta     _knight+1
 ;
 ; mapPos += mapWidth;
 ;
-	.dbg	line, "game.c", 321
+	.dbg	line, "game.c", 340
 	lda     _mapWidth
 	clc
 	adc     _mapPos
@@ -2790,33 +4166,34 @@ L000C:	lda     _knight+1
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 322
+	.dbg	line, "game.c", 341
 	lda     _mapPos
 ;
-; else if(knight.x <= 0 ){
+; else if(knight.x <= 3 ){
 ;
-	.dbg	line, "game.c", 328
-	jmp     L001A
+	.dbg	line, "game.c", 348
+	jmp     L001B
 L000D:	lda     _knight
-	bne     L000E
+	cmp     #$04
+	bcs     L000E
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 329
+	.dbg	line, "game.c", 349
 	lda     #$04
 	jsr     pusha
 	lda     #$00
 	jsr     _pal_fade_to
 ;
-; knight.x = 239;
+; knight.x = 236;
 ;
-	.dbg	line, "game.c", 330
-	lda     #$EF
+	.dbg	line, "game.c", 350
+	lda     #$EC
 	sta     _knight
 ;
 ; mapPos=mapPos-1;
 ;
-	.dbg	line, "game.c", 331
+	.dbg	line, "game.c", 351
 	lda     _mapPos
 	ldx     _mapPos+1
 	sec
@@ -2824,31 +4201,31 @@ L000D:	lda     _knight
 	bcs     L000A
 	dex
 ;
-; else if(knight.x >= 240){
+; else if(knight.x >= 237){
 ;
-	.dbg	line, "game.c", 338
+	.dbg	line, "game.c", 359
 	jmp     L000A
 L000E:	lda     _knight
-	cmp     #$F0
+	cmp     #$ED
 	bcc     L0009
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 339
+	.dbg	line, "game.c", 360
 	lda     #$04
 	jsr     pusha
 	lda     #$00
 	jsr     _pal_fade_to
 ;
-; knight.x = 1;//can't go less than 0, so have to be a pixel over
+; knight.x = 4;//can't go less than 0, so have to be a pixel over
 ;
-	.dbg	line, "game.c", 340
-	lda     #$01
+	.dbg	line, "game.c", 361
+	lda     #$04
 	sta     _knight
 ;
 ; mapPos=mapPos+1;
 ;
-	.dbg	line, "game.c", 341
+	.dbg	line, "game.c", 362
 	lda     _mapPos
 	ldx     _mapPos+1
 	clc
@@ -2860,8 +4237,8 @@ L000A:	sta     _mapPos
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 342
-L001A:	sta     ptr1
+	.dbg	line, "game.c", 363
+L001B:	sta     ptr1
 	lda     _mapPos+1
 	clc
 	adc     #>(_worldMap)
@@ -2872,28 +4249,33 @@ L001A:	sta     ptr1
 ;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 343
+	.dbg	line, "game.c", 364
 	jsr     _draw_bg
 ;
 ; drawSprites();
 ;
-	.dbg	line, "game.c", 344
+	.dbg	line, "game.c", 365
 	jsr     _drawSprites
 ;
 ; ppu_wait_nmi();
 ;
-	.dbg	line, "game.c", 345
+	.dbg	line, "game.c", 366
 	jsr     _ppu_wait_nmi
 ;
 ; pal_bright(4); // back to normal brightness 
 ;
-	.dbg	line, "game.c", 346
+	.dbg	line, "game.c", 367
 	lda     #$04
-	jmp     _pal_bright
+	jsr     _pal_bright
+;
+; loadRoomData();
+;
+	.dbg	line, "game.c", 368
+	jmp     _loadRoomData
 ;
 ; }
 ;
-	.dbg	line, "game.c", 350
+	.dbg	line, "game.c", 372
 L0009:	rts
 
 	.dbg	line
@@ -2914,38 +4296,38 @@ L0009:	rts
 ;
 ; ppu_off(); // screen off
 ;
-	.dbg	line, "game.c", 252
+	.dbg	line, "game.c", 269
 	jsr     _ppu_off
 ;
 ; vram_adr(NTADR_A(0,0));//set to top corner
 ;
-	.dbg	line, "game.c", 253
+	.dbg	line, "game.c", 270
 	ldx     #$20
 	lda     #$00
 	jsr     _vram_adr
 ;
 ; i = 0;
 ;
-	.dbg	line, "game.c", 254
+	.dbg	line, "game.c", 271
 	lda     #$00
 	sta     _i
 	sta     _i+1
 ;
 ; vram_put(0);
 ;
-	.dbg	line, "game.c", 256
+	.dbg	line, "game.c", 273
 L0008:	jsr     _vram_put
 ;
 ; i++;
 ;
-	.dbg	line, "game.c", 257
+	.dbg	line, "game.c", 274
 	inc     _i
 	bne     L0005
 	inc     _i+1
 ;
 ; }while(i < 960);//32*30
 ;
-	.dbg	line, "game.c", 258
+	.dbg	line, "game.c", 275
 L0005:	lda     _i
 	cmp     #$C0
 	lda     _i+1
@@ -2958,8 +4340,110 @@ L0006:	asl     a
 ;
 ; ppu_on_all();
 ;
-	.dbg	line, "game.c", 259
+	.dbg	line, "game.c", 276
 	jmp     _ppu_on_all
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ win (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_win: near
+
+	.dbg	func, "win", "00", extern, "_win"
+
+.segment	"CODE"
+
+;
+; pal_fade_to(4,0); // fade to black
+;
+	.dbg	line, "game.c", 375
+	lda     #$04
+	jsr     pusha
+	lda     #$00
+	jsr     _pal_fade_to
+;
+; oam_clear();//clear sprite buffer
+;
+	.dbg	line, "game.c", 377
+	jsr     _oam_clear
+;
+; clearScreen();
+;
+	.dbg	line, "game.c", 378
+	jsr     _clearScreen
+;
+; loop = 0;
+;
+	.dbg	line, "game.c", 379
+	lda     #$00
+	sta     _loop
+	sta     _loop+1
+;
+; vram_adr(NTADR_A(12,14)); // screen is 32 x 30 tiles
+;
+	.dbg	line, "game.c", 380
+	ldx     #$21
+	lda     #$CC
+	jsr     _vram_adr
+;
+; vram_write(winTxt,sizeof(winTxt));
+;
+	.dbg	line, "game.c", 381
+	lda     #<(_winTxt)
+	ldx     #>(_winTxt)
+	jsr     pushax
+	ldx     #$00
+	lda     #$08
+	jsr     _vram_write
+;
+; pal_bright(4); // back to normal brightness 
+;
+	.dbg	line, "game.c", 382
+	lda     #$04
+	jmp     _pal_bright
+
+	.dbg	line
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ loadRoomData (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_loadRoomData: near
+
+	.dbg	func, "loadRoomData", "00", extern, "_loadRoomData"
+
+.segment	"CODE"
+
+;
+; if(which_bg == 9) {numberOfE = 0;}
+;
+	.dbg	line, "game.c", 388
+	ldx     #$00
+	lda     _which_bg
+	cmp     #$09
+	bne     L0005
+	txa
+;
+; else{numberOfE = 3;}
+;
+	.dbg	line, "game.c", 389
+	jmp     L0006
+L0005:	lda     #$03
+L0006:	sta     _numberOfE
+	stx     _numberOfE+1
+;
+; }
+;
+	.dbg	line, "game.c", 390
+	rts
 
 	.dbg	line
 .endproc
@@ -3016,10 +4500,23 @@ L0006:	asl     a
 	lda     #$FF
 	jsr     _set_scroll_y
 ;
+; mapPos = center; //setting the mapPos to the center of map
+;
+	.dbg	line, "game.c", 25
+	lda     _center+1
+	sta     _mapPos+1
+	lda     _center
+	sta     _mapPos
+;
 ; draw_bg();
 ;
 	.dbg	line, "game.c", 27
 	jsr     _draw_bg
+;
+; while (loop){
+;
+	.dbg	line, "game.c", 34
+	jmp     L0005
 ;
 ; ppu_wait_nmi();
 ;
@@ -3080,10 +4577,38 @@ L0002:	jsr     _ppu_wait_nmi
 	.dbg	line, "game.c", 48
 	jsr     _loseCheck
 ;
-; while (1){
+; if (iFrame > 0){
+;
+	.dbg	line, "game.c", 50
+	lda     _iFrame
+	cmp     #$01
+	lda     _iFrame+1
+	sbc     #$00
+	bvs     L0006
+	eor     #$80
+L0006:	bpl     L0005
+;
+; iFrame -= 1;
+;
+	.dbg	line, "game.c", 51
+	lda     _iFrame
+	sec
+	sbc     #$01
+	sta     _iFrame
+	bcs     L0005
+	dec     _iFrame+1
+;
+; while (loop){
 ;
 	.dbg	line, "game.c", 34
-	jmp     L0002
+L0005:	lda     _loop
+	ora     _loop+1
+	bne     L0002
+;
+; while (1){ //prevents crashes on "win"
+;
+	.dbg	line, "game.c", 54
+L000B:	jmp     L000B
 
 	.dbg	line
 .endproc

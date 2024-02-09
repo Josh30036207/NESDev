@@ -9,7 +9,8 @@
 unsigned char pad1;
 unsigned char pad1_new;
 unsigned char collision;
-const unsigned char text[]="You Died"; // zero terminated c string
+unsigned char text[]="You Died"; // zero terminated c string
+unsigned char winTxt[]="You Win";
 unsigned char collision_L;
 unsigned char collision_R;
 unsigned char collision_U;
@@ -28,8 +29,8 @@ int i;
 int health = 8;
 int maxHealth = 8;
 int iFrame = 0;
+int loop = 1;
 
- 
 
  struct hollow { //basic entity
 	unsigned char x;
@@ -45,10 +46,12 @@ int numberOfE = 3; // Can't use value for creating an array
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 struct hollow tempE[3];
 
+struct hollow winBlock = {120, 112, 15, 7};
+
 
 unsigned char c_map[240];
 // collision map 
-const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4};//add the maps to the array
+const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4,map5,map6,map7,map8,winRoom};//add the maps to the array
 
 
 //Prototypes
@@ -64,3 +67,5 @@ void loseCheck(void);
 void testButton(void); //used to test features
 void nextRoom(void);//load next room if the player walks off the edge
 void clearScreen(void);
+void win(void);
+void loadRoomData(void);

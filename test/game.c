@@ -22,7 +22,7 @@ void main (void) {
 	
 	set_scroll_y(0xff); //shift the bg down 1 pixel
 	
-
+	mapPos = center; //setting the mapPos to the center of map
 	
 	draw_bg();
 	
@@ -31,7 +31,7 @@ void main (void) {
 	
 
 
-	while (1){
+	while (loop){
 		// infinite loop
 		// game code can go here later.
 		ppu_wait_nmi();
@@ -47,30 +47,36 @@ void main (void) {
 		updateHealth();
 		loseCheck();
 		
+		if (iFrame > 0){
+				iFrame -= 1;
+		}
+	}
+	while (1){ //prevents crashes on "win"
+		//hamburger
 	}
 }
 	
 void move (void){
 	if(pad1 & PAD_LEFT){
-		knight.x -= 1;
+		knight.x -= 2;
 	}
 	else if (pad1 & PAD_RIGHT){
-		knight.x += 1;
+		knight.x += 2;
 		
 	}
 	bgCollision();
-	if(collision_R) knight.x -= 1;
-	if(collision_L) knight.x += 1;
+	if(collision_R) knight.x -= 2;
+	if(collision_L) knight.x += 2;
 	if(pad1 & PAD_UP){
-		knight.y -= 1;
+		knight.y -= 2;
 		
 	}
 	else if (pad1 & PAD_DOWN){
-		knight.y += 1;
+		knight.y += 2;
 	}
 	bgCollision();
-	if(collision_D) knight.y -= 1;
-	if(collision_U) knight.y += 1;
+	if(collision_D) knight.y -= 2;
+	if(collision_U) knight.y += 2;
 }
 
 void drawSprites(void){
@@ -83,22 +89,33 @@ void drawSprites(void){
 	oam_meta_spr(knight.x, knight.y, metasprite);
 	
 	
-	
-	for(i = 0; i < numberOfE; i++){
-		oam_meta_spr(E[i].x, E[i].y , metasprite2);
+	if(which_bg == 9){
+		oam_meta_spr(winBlock.x, winBlock.y , fire);
+	}else{
+		for(i = 0; i < numberOfE; i++){
+			oam_meta_spr(E[i].x, E[i].y , metasprite2);
+		}
 	}
 	
 }
 
-void testCollision(void){//currently only checks the 1 enemy. Need to change to check all of them
+void testCollision(void){//tests collisions against sprites
 	for(i = 0; i < numberOfE; i++){
 		collision = check_collision(&knight, &E[i]); 
 		// change the BG color, if sprites are touching
 		if (collision){
 			E[i].y++;
+			if (iFrame <= 0){
+				health -= 1;
+				iFrame = 26;
+				
+			}
+			
 		}
 	}
-	
+	if(which_bg == 9){
+		collision = check_collision(&knight, &winBlock);
+		 if (collision){win();}}
 }
 
 void draw_bg(void){
@@ -218,7 +235,7 @@ void check_start(void){//Testing loading backgrounds
 	}	
 }
 
-void loadEnemyData(void){ //need to load enemies from map
+void loadEnemyData(void){ //need to load enemies from map //not fully implimented yet
 	E[0].x = 64;
 	E[0].y = 64;
 	E[0].width = 15;
@@ -236,7 +253,7 @@ void loadEnemyData(void){ //need to load enemies from map
 
 	
 	// which_bg holds a char with the level number. e.g. map_1 = 1
-	//numberOfE = which_bg+1;
+	numberOfE = 3;
 	
 
 }
@@ -284,10 +301,11 @@ void loseCheck(void){//
 		ppu_off(); // screen off //make this better and fade in/out after saying you died
 		clearScreen();
 		which_bg = 0;
+		mapPos = center;
 		draw_bg();
 		health = maxHealth;
-		//knight.x = 120;
-		//knight.y = 112;
+		knight.x = 120;
+		knight.y = 112;
 		ppu_wait_nmi();
 		ppu_on_all();
 		pal_bright(4); // back to normal brightness	
@@ -296,7 +314,7 @@ void loseCheck(void){//
 }
 
 
-void testButton(void){
+void testButton(void){//currently tests health
 	if(pad1_new & PAD_SELECT){
 		health -= 1;
 		
@@ -305,46 +323,68 @@ void testButton(void){
 }
 
 void nextRoom(void){ //currently just iterates the background - need to change to follow a proper map.
-	if(knight.y < 16){
+	if(knight.y < 13){
 		pal_fade_to(4,0); // fade to black
-		knight.y = 224;
+		knight.y = 221;
 		mapPos -= mapWidth;
 		which_bg = worldMap[mapPos];
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
+		loadRoomData();
 	}
-	else if(knight.y > 224){
+	else if(knight.y > 221){
 		pal_fade_to(4,0); // fade to black
-		knight.y = 16;
+		knight.y = 13;
 		mapPos += mapWidth;
 		which_bg = worldMap[mapPos];
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
+		loadRoomData();
 	}
-	else if(knight.x <= 0 ){
+	else if(knight.x <= 3 ){
 		pal_fade_to(4,0); // fade to black
-		knight.x = 239;
+		knight.x = 236;
 		mapPos=mapPos-1;
 		which_bg = worldMap[mapPos];
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
+		loadRoomData();
 	}
-	else if(knight.x >= 240){
+	else if(knight.x >= 237){
 		pal_fade_to(4,0); // fade to black
-		knight.x = 1;//can't go less than 0, so have to be a pixel over
+		knight.x = 4;//can't go less than 0, so have to be a pixel over
 		mapPos=mapPos+1;
 		which_bg = worldMap[mapPos];
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
+		loadRoomData();
 	}
 	
 	
+}
+
+void win(void){
+	pal_fade_to(4,0); // fade to black
+		//you win - temp win screen for demo
+		oam_clear();//clear sprite buffer
+		clearScreen();
+		loop = 0;
+		vram_adr(NTADR_A(12,14)); // screen is 32 x 30 tiles
+		vram_write(winTxt,sizeof(winTxt));
+		pal_bright(4); // back to normal brightness	
+	
+		
+}
+
+void loadRoomData(void){
+	if(which_bg == 9) {numberOfE = 0;}
+	else{numberOfE = 3;}
 }
