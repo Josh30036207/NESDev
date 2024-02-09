@@ -47,7 +47,7 @@ WHITE,0,0,0,
 }; 
 const unsigned char paletteSp[]={//palette for the sprites
 PINK, DK_GY, BLUE, BROWN,
-WHITE,0x16,0,0x00,
+WHITE,0x16,0x19,0x00,
 0,0x26,0x06,0x16,
 0,0,0,0
 }; 

@@ -27,7 +27,11 @@ unsigned char temp_y;
 
 int i;
 int health = 8;
+int stamina = 8;
 int maxHealth = 8;
+int maxStam = 8;
+int regenTimer;
+int timerSpeed = 70;
 int iFrame = 0;
 int loop = 1;
 
@@ -69,3 +73,4 @@ void nextRoom(void);//load next room if the player walks off the edge
 void clearScreen(void);
 void win(void);
 void loadRoomData(void);
+void updateStamina(void);

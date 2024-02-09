@@ -23,6 +23,7 @@ void main (void) {
 	set_scroll_y(0xff); //shift the bg down 1 pixel
 	
 	mapPos = center; //setting the mapPos to the center of map
+	regenTimer = timerSpeed;
 	
 	draw_bg();
 	
@@ -45,6 +46,7 @@ void main (void) {
 		check_start();
 		testButton();//currently select
 		updateHealth();
+		updateStamina();
 		loseCheck();
 		
 		if (iFrame > 0){
@@ -304,6 +306,7 @@ void loseCheck(void){//
 		mapPos = center;
 		draw_bg();
 		health = maxHealth;
+		stamina = maxStam;
 		knight.x = 120;
 		knight.y = 112;
 		ppu_wait_nmi();
@@ -317,7 +320,8 @@ void loseCheck(void){//
 void testButton(void){//currently tests health
 	if(pad1_new & PAD_SELECT){
 		health -= 1;
-		
+		stamina -=1;
+		regenTimer = timerSpeed;
 	}
 	
 }
@@ -387,4 +391,15 @@ void win(void){
 void loadRoomData(void){
 	if(which_bg == 9) {numberOfE = 0;}
 	else{numberOfE = 3;}
+}
+
+void updateStamina(void){
+	if(stamina < maxStam && regenTimer <= 0){
+		stamina++;
+		regenTimer = timerSpeed;
+	}else{regenTimer -= 1;}
+	
+	for(i = 0; i < stamina; i++){
+		oam_spr((i*8), 8, 0x90, 1);
+	}
 }
