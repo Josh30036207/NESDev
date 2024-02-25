@@ -37,6 +37,7 @@ int timerSpeed = 70;
 int iFrame = 0;
 int loop = 1;
 int roll = 0;
+int dir = 3;
 
 
  struct hollow { //basic entity
@@ -67,13 +68,15 @@ void move(void);
 void testCollision(void);
 void draw_bg(void);
 void bgCollision(void);
-void check_start(void);
 void loadEnemyData(void);
 void updateHealth(void);
 void loseCheck(void);
-void testButton(void); //used to test features
 void nextRoom(void);//load next room if the player walks off the edge
 void clearScreen(void);
 void win(void);
 void loadRoomData(void);
 void updateStamina(void);
+void selBtn(void); //Select
+void stBtn(void);//Start
+void aBtn(void);
+void bBtn(void);

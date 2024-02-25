@@ -29,6 +29,49 @@ const unsigned char rightSprite[]={
 	  8,  8,0x33,0,
 	128
 };
+//Attack Sprites
+const unsigned char upAttSprite[]={
+	  0,  0,0x44,0,
+	  8,  0,0x45,0,
+	  0,  8,0x54,0,
+	  8,  8,0x55,0,
+	128
+};
+
+const unsigned char downAttSprite[]={
+	  0,  0,0x40,0,
+	  8,  0,0x41,0,
+	  0,  8,0x50,0,
+	  8,  8,0x51,0,
+	128
+};
+
+const unsigned char leftAttSprite[]={
+	  8,  0,0x42,0|OAM_FLIP_H,
+	  0,  0,0x43,0|OAM_FLIP_H,
+	  8,  8,0x52,0|OAM_FLIP_H,
+	  0,  8,0x53,0|OAM_FLIP_H,
+	128
+};
+
+const unsigned char rightAttSprite[]={
+	  0,  0,0x42,0,
+	  8,  0,0x43,0,
+	  0,  8,0x52,0,
+	  8,  8,0x53,0,
+	128
+};
+
+const unsigned char upSwd[]={
+	  0,  0,0x36,0,
+	  8,  0,0x37,0,
+	128
+};
+const unsigned char rightSwd[]={
+	  0,  0,0x46,0,
+	  0,  8,0x56,0,
+	128
+};
 
 const unsigned char rollSprite[]={
 	  0,  0,0x02,0,

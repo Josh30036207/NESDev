@@ -43,11 +43,13 @@ void main (void) {
 		nextRoom();
 		testCollision();//sprite collisions
 		drawSprites();
-		check_start();
-		testButton();//currently select
+		stBtn();
+		selBtn();//currently select
 		updateHealth();
 		updateStamina();
 		loseCheck();
+		aBtn();
+		bBtn();
 		
 		if (iFrame > 0){
 				iFrame -= 1;
@@ -61,6 +63,7 @@ void main (void) {
 void move (void){
 	if(pad1 & PAD_LEFT){
 		playerSprite = leftSprite;
+		dir = 4;
 		knight.x -= 2;
 		if(roll == 1){
 			iFrame = 12;
@@ -96,6 +99,7 @@ void move (void){
 	}
 	else if (pad1 & PAD_RIGHT){
 		playerSprite = rightSprite;
+		dir = 2;
 		knight.x += 2;
 		if(roll == 1){
 			iFrame = 12;
@@ -110,6 +114,7 @@ void move (void){
 	if(collision_L) knight.x += 2;
 	if(pad1 & PAD_UP){
 		playerSprite = upSprite;
+		dir = 1;
 		knight.y -= 2;
 		if(roll == 1){
 			iFrame = 12;
@@ -121,6 +126,7 @@ void move (void){
 	}
 	else if (pad1 & PAD_DOWN){
 		playerSprite = downSprite;
+		dir = 3;
 		knight.y += 2;
 		if(roll == 1){
 			iFrame = 12;
@@ -282,19 +288,6 @@ void bgCollision(){
 	}
 }
 
-void check_start(void){//Testing loading backgrounds
-	// if START is pressed, dodge/roll
-	roll = 0;
-	if(pad1_new & PAD_START){
-		
-		if (stamina >= 1){
-				roll = 1;
-			}
-	}	
-
-	
-}
-
 void loadEnemyData(void){ //need to load enemies from map //not fully implimented yet
 	E[0].x = 64;
 	E[0].y = 64;
@@ -374,16 +367,6 @@ void loseCheck(void){//
 	}
 }
 
-
-void testButton(void){//currently tests health
-	if(pad1_new & PAD_SELECT){
-		health -= 1;
-		stamina -=1;
-		regenTimer = timerSpeed;
-	}
-	
-}
-
 void nextRoom(void){ //currently just iterates the background - need to change to follow a proper map.
 	if(knight.y < 13){
 		pal_fade_to(4,0); // fade to black
@@ -460,4 +443,53 @@ void updateStamina(void){
 	for(i = 0; i < stamina; i++){
 		oam_spr((i*8), 8, 0x90, 1);
 	}
+}
+
+void aBtn(void){//attack
+	if(pad1_new & PAD_A ){
+		if(stamina >= 1){
+			switch(dir){
+				case 1:
+				playerSprite=upAttSprite;
+				break;
+				case 2:
+				playerSprite=rightAttSprite;
+				break;
+				case 3:
+				playerSprite=downAttSprite;
+				break;
+				case 4:
+				playerSprite=leftAttSprite;
+				break;
+			}
+			stamina-=1;
+		}
+	}
+}
+
+void bBtn(void){//roll
+	if(pad1_new & PAD_B){
+		health -= 1;
+		stamina -=1;
+		regenTimer = timerSpeed;
+	}
+}
+
+
+void stBtn(void){//dodge/roll
+	roll = 0;
+	if(pad1_new & PAD_START){
+		if (stamina >= 1){
+				roll = 1;
+			}
+	}	
+}
+
+void selBtn(void){//map? //Currently used to test Health/Stamina
+	if(pad1_new & PAD_SELECT){
+		health -= 1;
+		stamina -=1;
+		regenTimer = timerSpeed;
+	}
+	
 }
