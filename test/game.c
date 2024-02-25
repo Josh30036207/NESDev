@@ -24,7 +24,7 @@ void main (void) {
 	
 	mapPos = center; //setting the mapPos to the center of map
 	regenTimer = timerSpeed;
-	
+	playerSprite = downSprite;
 	draw_bg();
 	
 	//ppu_on_all(); //	turn on screen now in draw_bg();
@@ -60,21 +60,75 @@ void main (void) {
 	
 void move (void){
 	if(pad1 & PAD_LEFT){
+		playerSprite = leftSprite;
 		knight.x -= 2;
+		if(roll == 1){
+			iFrame = 12;
+			stamina -= 1;
+			playerSprite = rollSprite;
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+			knight.x -= 3;
+			nextRoom();
+
+			
+		}
 	}
 	else if (pad1 & PAD_RIGHT){
+		playerSprite = rightSprite;
 		knight.x += 2;
-		
+		if(roll == 1){
+			iFrame = 12;
+			stamina -= 1;
+			playerSprite = rollSprite;
+			knight.x += 32;
+			
+		}
 	}
 	bgCollision();
 	if(collision_R) knight.x -= 2;
 	if(collision_L) knight.x += 2;
 	if(pad1 & PAD_UP){
+		playerSprite = upSprite;
 		knight.y -= 2;
-		
+		if(roll == 1){
+			iFrame = 12;
+			stamina -= 1;
+			playerSprite = rollSprite;
+			knight.y -= 32;
+			
+		}
 	}
 	else if (pad1 & PAD_DOWN){
+		playerSprite = downSprite;
 		knight.y += 2;
+		if(roll == 1){
+			iFrame = 12;
+			stamina -= 1;
+			playerSprite = rollSprite;
+			knight.y += 32;
+			
+		}
 	}
 	bgCollision();
 	if(collision_D) knight.y -= 2;
@@ -86,16 +140,16 @@ void drawSprites(void){
 	// clear all sprites from sprite buffer
 	oam_clear();
 	bank_spr(1);//switch to player spritesheet
-	// draw 2 metasprites
+
 	
-	oam_meta_spr(knight.x, knight.y, metasprite);
+	{oam_meta_spr(knight.x, knight.y, playerSprite);}
 	
 	
 	if(which_bg == 9){
 		oam_meta_spr(winBlock.x, winBlock.y , fire);
 	}else{
 		for(i = 0; i < numberOfE; i++){
-			oam_meta_spr(E[i].x, E[i].y , metasprite2);
+			oam_meta_spr(E[i].x, E[i].y , hollowSprite);
 		}
 	}
 	
@@ -229,12 +283,16 @@ void bgCollision(){
 }
 
 void check_start(void){//Testing loading backgrounds
-	// if START is pressed, load another background
+	// if START is pressed, dodge/roll
+	roll = 0;
 	if(pad1_new & PAD_START){
-		++which_bg;
-		if(which_bg >= 2) which_bg = 0;
-		draw_bg();
+		
+		if (stamina >= 1){
+				roll = 1;
+			}
 	}	
+
+	
 }
 
 void loadEnemyData(void){ //need to load enemies from map //not fully implimented yet

@@ -1,12 +1,44 @@
-const unsigned char metasprite[]={
-	  0,  0,0x00,0,
-	  8,  0,0x01,0,
-	  0,  8,0x10,0,
-	  8,  8,0x11,0,
+const unsigned char upSprite[]={
+	  0,  0,0x24,0,
+	  8,  0,0x25,0,
+	  0,  8,0x34,0,
+	  8,  8,0x35,0,
 	128
 };
 
-const unsigned char metasprite2[]={
+const unsigned char downSprite[]={
+	  0,  0,0x20,0,
+	  8,  0,0x21,0,
+	  0,  8,0x30,0,
+	  8,  8,0x31,0,
+	128
+};
+
+const unsigned char leftSprite[]={
+	  8,  0,0x22,0|OAM_FLIP_H,
+	  0,  0,0x23,0|OAM_FLIP_H,
+	  8,  8,0x32,0|OAM_FLIP_H,
+	  0,  8,0x33,0|OAM_FLIP_H,
+	128
+};
+
+const unsigned char rightSprite[]={
+	  0,  0,0x22,0,
+	  8,  0,0x23,0,
+	  0,  8,0x32,0,
+	  8,  8,0x33,0,
+	128
+};
+
+const unsigned char rollSprite[]={
+	  0,  0,0x02,0,
+	  8,  0,0x03,0,
+	  0,  8,0x12,0,
+	  8,  8,0x13,0,
+	128
+};
+
+const unsigned char hollowSprite[]={
 	  0,  0,0x01,0|OAM_FLIP_H,
 	  0,  8,0x11,0|OAM_FLIP_H,
 	  8,  0,0x01,0,
@@ -14,13 +46,6 @@ const unsigned char metasprite2[]={
 	128
 };
 
-const unsigned char metasprite3[]={
-	  0,  0,0x00,0,
-	  0,  8,0x10,0,
-	  8,  0,0x00,0|OAM_FLIP_H,
-	  8,  8,0x10,0|OAM_FLIP_H,
-	128
-};
 
 const unsigned char fire[]={
 	  0,  0,0x81,2,

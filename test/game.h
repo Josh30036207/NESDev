@@ -25,6 +25,8 @@ unsigned char temp4;
 unsigned char temp_x;
 unsigned char temp_y;
 
+const unsigned char *playerSprite;
+
 int i;
 int health = 8;
 int stamina = 8;
@@ -34,6 +36,7 @@ int regenTimer;
 int timerSpeed = 70;
 int iFrame = 0;
 int loop = 1;
+int roll = 0;
 
 
  struct hollow { //basic entity
