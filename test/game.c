@@ -360,6 +360,7 @@ void loseCheck(void){//
 		stamina = maxStam;
 		knight.x = 120;
 		knight.y = 112;
+		flasks = 3;
 		ppu_wait_nmi();
 		ppu_on_all();
 		pal_bright(4); // back to normal brightness	
@@ -463,25 +464,26 @@ void aBtn(void){//attack
 				break;
 			}
 			stamina-=1;
+			//still need to draw rest of blade
 		}
 	}
 }
 
 void bBtn(void){//roll
+	roll = 0;
 	if(pad1_new & PAD_B){
-		health -= 1;
-		stamina -=1;
-		regenTimer = timerSpeed;
+		if (stamina >= 1){
+				roll = 1;
+			}
 	}
 }
 
 
-void stBtn(void){//dodge/roll
-	roll = 0;
-	if(pad1_new & PAD_START){
-		if (stamina >= 1){
-				roll = 1;
-			}
+void stBtn(void){//heal - TODO
+	
+	if(pad1_new & PAD_START && flasks > 0){
+		flasks -=1;
+		health = maxHealth; //placeholder
 	}	
 }
 
@@ -493,3 +495,11 @@ void selBtn(void){//map? //Currently used to test Health/Stamina
 	}
 	
 }
+
+//TODO - Minimum
+//Player Roll
+//Player Attack
+//Player Heal
+//Enemy Random Spawn
+//Better Enemy Attack
+//Boss Fight

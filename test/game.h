@@ -38,6 +38,8 @@ int iFrame = 0;
 int loop = 1;
 int roll = 0;
 int dir = 3;
+int canMove = 1;
+int flasks = 3;
 
 
  struct hollow { //basic entity
