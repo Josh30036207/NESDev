@@ -44,7 +44,7 @@ void main (void) {
 		testCollision();//sprite collisions
 		drawSprites();
 		stBtn();
-		selBtn();//currently select
+		selBtn();
 		updateHealth();
 		updateStamina();
 		loseCheck();
@@ -53,6 +53,8 @@ void main (void) {
 		
 		if (iFrame > 0){
 				iFrame -= 1;
+		}else{
+			roll = 0;
 		}
 	}
 	while (1){ //prevents crashes on "win"
@@ -61,84 +63,50 @@ void main (void) {
 }
 	
 void move (void){
-	if(pad1 & PAD_LEFT){
-		playerSprite = leftSprite;
-		dir = 4;
-		knight.x -= 2;
-		if(roll == 1){
-			iFrame = 12;
-			stamina -= 1;
-			playerSprite = rollSprite;
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
-			knight.x -= 3;
-			nextRoom();
+	if(roll){
+		knight.x += rHVal;
+		knight.y += rVVal;
 
+		bgCollision();//cant roll through walls
+		if(collision_R) knight.x -= 3;
+		if(collision_L) knight.x += 3;
+		if(collision_D) knight.y -= 3;
+		if(collision_U) knight.y += 3;
+	}
+	else{
+		if(pad1 & PAD_LEFT){
+			playerSprite = leftSprite;
+			dir = 4;
+			knight.x -= 2;
+			rHVal = -3;
 			
 		}
-	}
-	else if (pad1 & PAD_RIGHT){
-		playerSprite = rightSprite;
-		dir = 2;
-		knight.x += 2;
-		if(roll == 1){
-			iFrame = 12;
-			stamina -= 1;
-			playerSprite = rollSprite;
-			knight.x += 32;
-			
+		else if (pad1 & PAD_RIGHT){
+			playerSprite = rightSprite;
+			dir = 2;
+			knight.x += 2;
+			rHVal = 3;
+		}else{rHVal = 0;}
+		bgCollision();
+		if(collision_R) knight.x -= 2;
+		if(collision_L) knight.x += 2;
+		if(pad1 & PAD_UP){
+			playerSprite = upSprite;
+			dir = 1;
+			knight.y -= 2;
+			rVVal = -3;
 		}
+		else if (pad1 & PAD_DOWN){
+			playerSprite = downSprite;
+			dir = 3;
+			knight.y += 2;
+			rVVal = 3;
+		}else{rVVal = 0;}
+		bgCollision();
+		if(collision_D) knight.y -= 2;
+		if(collision_U) knight.y += 2;
 	}
-	bgCollision();
-	if(collision_R) knight.x -= 2;
-	if(collision_L) knight.x += 2;
-	if(pad1 & PAD_UP){
-		playerSprite = upSprite;
-		dir = 1;
-		knight.y -= 2;
-		if(roll == 1){
-			iFrame = 12;
-			stamina -= 1;
-			playerSprite = rollSprite;
-			knight.y -= 32;
-			
-		}
-	}
-	else if (pad1 & PAD_DOWN){
-		playerSprite = downSprite;
-		dir = 3;
-		knight.y += 2;
-		if(roll == 1){
-			iFrame = 12;
-			stamina -= 1;
-			playerSprite = rollSprite;
-			knight.y += 32;
-			
-		}
-	}
-	bgCollision();
-	if(collision_D) knight.y -= 2;
-	if(collision_U) knight.y += 2;
+	
 }
 
 void drawSprites(void){
@@ -167,7 +135,7 @@ void testCollision(void){//tests collisions against sprites
 		// change the BG color, if sprites are touching
 		if (collision){
 			E[i].y++;
-			if (iFrame <= 0){
+			if (iFrame <= 0 && roll == 0){
 				health -= 1;
 				iFrame = 26;
 				
@@ -470,12 +438,36 @@ void aBtn(void){//attack
 }
 
 void bBtn(void){//roll
-	roll = 0;
 	if(pad1_new & PAD_B){
 		if (stamina >= 1){
+				stamina -= 1;
 				roll = 1;
+				playerSprite = rollSprite;
+				iFrame = 18;
+
+				// switch(dir){
+				// 	case 1:
+				// 	rHVal = 0;
+				// 	rVVal = -3;
+				// 	break;
+				// 	case 2:
+				// 	rHVal = 3;
+				// 	rVVal = 0;
+				// 	break;
+				// 	case 3:
+				// 	rHVal = 0;
+				// 	rVVal = 3;
+				// 	break;
+				// 	case 4:
+				// 	rHVal = -3;
+				// 	rVVal = 0;
+				// 	break;
+				// }
+				
 			}
 	}
+
+	
 }
 
 
@@ -487,7 +479,7 @@ void stBtn(void){//heal - TODO
 	}	
 }
 
-void selBtn(void){//map? //Currently used to test Health/Stamina
+void selBtn(void){//menu //Currently used to test Health/Stamina
 	if(pad1_new & PAD_SELECT){
 		health -= 1;
 		stamina -=1;
@@ -497,7 +489,7 @@ void selBtn(void){//map? //Currently used to test Health/Stamina
 }
 
 //TODO - Minimum
-//Player Roll
+//Player Roll //DONE
 //Player Attack
 //Player Heal
 //Enemy Random Spawn
