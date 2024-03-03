@@ -148,7 +148,7 @@ void testCollision(void){//tests collisions against sprites
 		 if (collision){win();}}
 }
 
-void draw_bg(void){
+void draw_bg(void){ //change this as is shit - only allows to draw from 1 palette
 	ppu_off(); // screen off
 	
 	p_maps = All_Collision_Maps[which_bg];
@@ -176,6 +176,11 @@ void draw_bg(void){
 				vram_put(0x07); // Heart 
 				vram_put(0x08); // Heart 
 			}
+			else if(c_map[temp1] == 9){
+				vram_put(0x33); // Flask 
+				vram_put(0x82); // Flask 
+				
+			}
 			else{
 				vram_put(0); // blank
 				vram_put(0);
@@ -198,11 +203,17 @@ void draw_bg(void){
 				vram_put(0x17); // Heart 
 				vram_put(0x18);
 			}
+			else if(c_map[temp1] == 9){
+				vram_put((0x00)); // Flask 
+				vram_put(0x00); // Flask 
+				
+			}
 			else{
 				vram_put(0); // blank
 				vram_put(0);
 			}
 		}
+		
 	}
 	loadEnemyData();
 	
@@ -444,25 +455,6 @@ void bBtn(void){//roll
 				roll = 1;
 				playerSprite = rollSprite;
 				iFrame = 18;
-
-				// switch(dir){
-				// 	case 1:
-				// 	rHVal = 0;
-				// 	rVVal = -3;
-				// 	break;
-				// 	case 2:
-				// 	rHVal = 3;
-				// 	rVVal = 0;
-				// 	break;
-				// 	case 3:
-				// 	rHVal = 0;
-				// 	rVVal = 3;
-				// 	break;
-				// 	case 4:
-				// 	rHVal = -3;
-				// 	rVVal = 0;
-				// 	break;
-				// }
 				
 			}
 	}
@@ -471,11 +463,16 @@ void bBtn(void){//roll
 }
 
 
-void stBtn(void){//heal - TODO
+void stBtn(void){//heal 
 	
 	if(pad1_new & PAD_START && flasks > 0){
 		flasks -=1;
-		health = maxHealth; //placeholder
+		health += 4;
+		if (health > maxHealth){health=maxHealth;};
+		
+		
+		
+
 	}	
 }
 
@@ -490,8 +487,9 @@ void selBtn(void){//menu //Currently used to test Health/Stamina
 
 //TODO - Minimum
 //Player Roll //DONE
-//Player Attack
-//Player Heal
+//Player Attack //Change enemy load first
+//Player Heal //DONE (Ish need to put a visual for number of heals left, but need to change background load first)
 //Enemy Random Spawn
 //Better Enemy Attack
 //Boss Fight
+//Better room load

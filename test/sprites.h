@@ -109,7 +109,7 @@ const unsigned char fire[]={
 
 const  char paletteBg[]={ //palette for the background
 BLACK, DK_GY, BLUE, 0x16,
-WHITE,0,0,0,
+0x1C,PINK,0,0,
 0,0,0,0,
 0,0,0,0
 }; 
