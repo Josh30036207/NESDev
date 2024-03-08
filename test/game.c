@@ -18,19 +18,22 @@ void main (void) {
 	bank_spr(1);
 	// set a starting point on the screen
 	// vram_adr(NTADR_A(x,y));
-	vram_adr(NTADR_A(3,3)); // screen is 32 x 30 tiles
-	clearScreen();
+	//vram_adr(NTADR_A(3,3)); // screen is 32 x 30 tiles
+	//clearScreen();
+	
+	set_vram_buffer(); // do at least once, sets a pointer to a buffer
+	draw_bg();
 	set_scroll_y(0xff); //shift the bg down 1 pixel
 	
 	mapPos = center; //setting the mapPos to the center of map
 	regenTimer = timerSpeed;
 	playerSprite = downSprite;
-	draw_bg();
-	
-	//ppu_on_all(); //	turn on screen now in draw_bg();
 	
 	
-
+	ppu_on_all(); //	turn on screen now in draw_bg();
+	
+	
+	//while (loop){}
 
 	while (loop){
 		// infinite loop
@@ -53,8 +56,9 @@ void main (void) {
 		
 		if (iFrame > 0){
 				iFrame -= 1;
-		}else{
+		}else if (roll == 1){
 			roll = 0;
+			playerSprite = downSprite; dir = 3;
 		}
 	}
 	while (1){ //prevents crashes on "win"
@@ -101,7 +105,7 @@ void move (void){
 			dir = 3;
 			knight.y += 2;
 			rVVal = 3;
-		}else{rVVal = 0;}
+		}else{rVVal = 0; }
 		bgCollision();
 		if(collision_D) knight.y -= 2;
 		if(collision_U) knight.y += 2;
@@ -148,77 +152,34 @@ void testCollision(void){//tests collisions against sprites
 		 if (collision){win();}}
 }
 
-void draw_bg(void){ //change this as is shit - only allows to draw from 1 palette
+
+void draw_bg(void){
+	mapTiles[35] = 48+flasks; //Update the mapTiles to have the correct number of flasks
+
 	ppu_off(); // screen off
-	
+	set_vram_buffer(); // do at least once, sets a pointer to a buffer
+	//copy the room to the collision map
 	p_maps = All_Collision_Maps[which_bg];
-	// copy the collision map to c_map
 	memcpy (c_map, p_maps, 240);
-	
-	// this sets a start position on the BG, top left of screen
-	vram_adr(NAMETABLE_A);
-	
-	// draw a row of tiles //Each "block" is a 2X2 tile, so call vram_put twice to per row for each block
-	//Check what block is in the map. Put a 0 for an empty space
-	for(temp_y = 0; temp_y < 15; ++temp_y){
-		for(temp_x = 0; temp_x < 16; ++temp_x){
-			temp1 = (temp_y << 4) + temp_x;
-
-			if(c_map[temp1] == 1){
-				vram_put(0x02); // wall
-				vram_put(0x02);
-			}
-			else if(c_map[temp1] == 2){
-				vram_put(0x03); // Pink
-				vram_put(0x03);
-			}
-			else if(c_map[temp1] == 3){
-				vram_put(0x07); // Heart 
-				vram_put(0x08); // Heart 
-			}
-			else if(c_map[temp1] == 9){
-				vram_put(0x33); // Flask 
-				vram_put(0x82); // Flask 
-				
-			}
-			else{
-				vram_put(0); // blank
-				vram_put(0);
-			}
+	set_data_pointer(p_maps);
+	set_mt_pointer(mapTiles);
+	for(y=0; ;y+=0x20){
+		for(x=0; ;x+=0x20){
+			address = get_ppu_addr(0, x, y);
+			index = (y & 0xf0) + (x >> 4);
+			buffer_4_mt(address, index); // ppu_address, index to the data
+			flush_vram_update2();
+			if (x == 0xe0) break;
 		}
-		
-		// draw a second row of tiles
-		for(temp_x = 0; temp_x < 16; ++temp_x){
-			temp1 = (temp_y << 4) + temp_x;
-
-			if(c_map[temp1] == 1){
-				vram_put(0x02); // wall
-				vram_put(0x02);
-			}
-			else if(c_map[temp1] == 2){
-				vram_put(0x03); // Pink
-				vram_put(0x03);
-			}
-			else if(c_map[temp1] == 3){
-				vram_put(0x17); // Heart 
-				vram_put(0x18);
-			}
-			else if(c_map[temp1] == 9){
-				vram_put((0x00)); // Flask 
-				vram_put(0x00); // Flask 
-				
-			}
-			else{
-				vram_put(0); // blank
-				vram_put(0);
-			}
-		}
-		
+		if (y == 0xe0) break;
 	}
-	loadEnemyData();
 	
+	
+	fskUpt();
+	loadEnemyData();
 	ppu_on_all(); // turn on screen
 }
+
 
 void bgCollision(){
 	// sprite collision with backgrounds
@@ -334,12 +295,16 @@ void loseCheck(void){//
 		clearScreen();
 		which_bg = 0;
 		mapPos = center;
+		
 		draw_bg();
 		health = maxHealth;
 		stamina = maxStam;
 		knight.x = 120;
 		knight.y = 112;
 		flasks = 3;
+		roll = 0;
+		dir = 3;
+		playerSprite = downSprite;
 		ppu_wait_nmi();
 		ppu_on_all();
 		pal_bright(4); // back to normal brightness	
@@ -353,6 +318,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		knight.y = 221;
 		mapPos -= mapWidth;
 		which_bg = worldMap[mapPos];
+		//draw_bg();
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
@@ -364,6 +330,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		knight.y = 13;
 		mapPos += mapWidth;
 		which_bg = worldMap[mapPos];
+		//draw_bg();
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
@@ -375,6 +342,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		knight.x = 236;
 		mapPos=mapPos-1;
 		which_bg = worldMap[mapPos];
+		//draw_bg();
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
@@ -386,6 +354,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		knight.x = 4;//can't go less than 0, so have to be a pixel over
 		mapPos=mapPos+1;
 		which_bg = worldMap[mapPos];
+		//draw_bg();
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
@@ -465,7 +434,7 @@ void bBtn(void){//roll
 
 void stBtn(void){//heal 
 	
-	if(pad1_new & PAD_START && flasks > 0){
+	if(pad1_new & PAD_START && flasks > 0 && roll == 0){
 		flasks -=1;
 		health += 4;
 		if (health > maxHealth){health=maxHealth;};
@@ -481,10 +450,19 @@ void selBtn(void){//menu //Currently used to test Health/Stamina
 		health -= 1;
 		stamina -=1;
 		regenTimer = timerSpeed;
+		draw_bg();
 	}
 	
 }
 
+void fskUpt(void){
+	
+	// mapTiles[35] = 48+flasks; //Update the mapTiles to have the correct number of flasks
+	// address = get_ppu_addr(0, 0xB0, 0);
+	// index = (0 & 0xf0) + (x >> 4);
+	// buffer_4_mt(address, index); // ppu_address, index to the data
+	// flush_vram_update2();
+}
 //TODO - Minimum
 //Player Roll //DONE
 //Player Attack //Change enemy load first

@@ -84,3 +84,23 @@ void selBtn(void); //Select
 void stBtn(void);//Start
 void aBtn(void);
 void bBtn(void);
+
+
+char mapTiles[]={ //per row TTL, TR, BL, BR, Colour 
+	0, 0, 0, 0,  0,//Empty Space
+	2, 2, 2, 2,  0,//Tiles
+	3, 3, 3, 3,  0,
+	0, 0, 0, 0,  0,
+	0, 0, 0, 0,  0,
+	0, 0, 0, 0,  0,
+	0, 0, 0, 0,  0,
+	48, 130, 0, 0,  1 //Flask
+};
+
+// bg draw variables
+int address;
+unsigned char x; 
+unsigned char y;
+unsigned char index;
+
+void fskUpt(void);
