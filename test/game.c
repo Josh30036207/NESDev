@@ -175,7 +175,6 @@ void draw_bg(void){
 	}
 	
 	
-	fskUpt();
 	loadEnemyData();
 	ppu_on_all(); // turn on screen
 }
@@ -437,9 +436,12 @@ void stBtn(void){//heal
 	if(pad1_new & PAD_START && flasks > 0 && roll == 0){
 		flasks -=1;
 		health += 4;
-		if (health > maxHealth){health=maxHealth;};
+		if (health > maxHealth){health=maxHealth;}//Ensure no overheal
 		
-		
+		//update GUI
+		mapTiles[35] = 48+flasks; //Update the mapTiles to have the correct number of flasks
+		address = get_ppu_addr(0, 0xF0, 0); //Address of the flask
+		buffer_1_mt(address, 7); // redraw just the flasks - no need to update entire screen + doesn't require the screen to be turned off
 		
 
 	}	
@@ -450,24 +452,17 @@ void selBtn(void){//menu //Currently used to test Health/Stamina
 		health -= 1;
 		stamina -=1;
 		regenTimer = timerSpeed;
-		draw_bg();
+		
 	}
 	
 }
 
-void fskUpt(void){
-	
-	// mapTiles[35] = 48+flasks; //Update the mapTiles to have the correct number of flasks
-	// address = get_ppu_addr(0, 0xB0, 0);
-	// index = (0 & 0xf0) + (x >> 4);
-	// buffer_4_mt(address, index); // ppu_address, index to the data
-	// flush_vram_update2();
-}
+
 //TODO - Minimum
 //Player Roll //DONE
 //Player Attack //Change enemy load first
-//Player Heal //DONE (Ish need to put a visual for number of heals left, but need to change background load first)
+//Player Heal //DONE 
 //Enemy Random Spawn
 //Better Enemy Attack
 //Boss Fight
-//Better room load
+//Better room load //DONE

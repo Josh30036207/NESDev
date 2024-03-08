@@ -104,3 +104,4 @@ unsigned char y;
 unsigned char index;
 
 void fskUpt(void);
+unsigned char coordinates;
