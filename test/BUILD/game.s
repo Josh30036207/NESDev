@@ -10,11 +10,11 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "game.c", 9866, 1709925698
+	.dbg		file, "game.c", 10109, 1710003239
 	.dbg		file, "LIB/neslib.h", 9196, 1701627949
 	.dbg		file, "LIB/nesdoug.h", 6756, 1701627949
 	.dbg		file, "sprites.h", 1995, 1709922740
-	.dbg		file, "game.h", 2498, 1709924655
+	.dbg		file, "game.h", 2469, 1710001533
 	.dbg		file, "BG/maps.c", 8433, 1709925762
 	.forceimport	__STARTUP__
 	.dbg		sym, "pal_bg", "00", extern, "_pal_bg"
@@ -28,6 +28,7 @@
 	.dbg		sym, "oam_meta_spr", "00", extern, "_oam_meta_spr"
 	.dbg		sym, "pad_poll", "00", extern, "_pad_poll"
 	.dbg		sym, "bank_spr", "00", extern, "_bank_spr"
+	.dbg		sym, "rand8", "00", extern, "_rand8"
 	.dbg		sym, "vram_adr", "00", extern, "_vram_adr"
 	.dbg		sym, "vram_put", "00", extern, "_vram_put"
 	.dbg		sym, "vram_write", "00", extern, "_vram_write"
@@ -54,6 +55,7 @@
 	.import		_oam_meta_spr
 	.import		_pad_poll
 	.import		_bank_spr
+	.import		_rand8
 	.import		_vram_adr
 	.import		_vram_put
 	.import		_vram_write
@@ -162,6 +164,7 @@
 	.export		_x
 	.export		_y
 	.export		_index
+	.export		_posChk
 	.export		_main
 
 .segment	"DATA"
@@ -256,6 +259,8 @@ _mapTiles:
 	.byte	$00
 	.byte	$00
 	.byte	$01
+_posChk:
+	.word	$0000
 
 .segment	"RODATA"
 
@@ -3998,85 +4003,171 @@ L000A:	rts
 .segment	"CODE"
 
 ;
-; E[0].x = 64;
+; for(i = 0; i < numberOfE; i++){
 ;
-	.dbg	line, "game.c", 231
-	lda     #$40
-	sta     _E
-;
-; E[0].y = 64;
-;
-	.dbg	line, "game.c", 232
-	sta     _E+1
-;
-; E[0].width = 15;
-;
-	.dbg	line, "game.c", 233
-	lda     #$0F
-	sta     _E+2
-;
-; E[0].height = 15;
-;
-	.dbg	line, "game.c", 234
-	sta     _E+3
-;
-; E[1].x = 128;
-;
-	.dbg	line, "game.c", 236
-	lda     #$80
-	sta     _E+4
-;
-; E[1].y = 128;
-;
-	.dbg	line, "game.c", 237
-	sta     _E+5
-;
-; E[1].width = 15;
-;
-	.dbg	line, "game.c", 238
-	lda     #$0F
-	sta     _E+6
-;
-; E[1].height = 15;
-;
-	.dbg	line, "game.c", 239
-	sta     _E+7
-;
-; E[2].x = 420;
-;
-	.dbg	line, "game.c", 241
-	lda     #$A4
-	sta     _E+8
-;
-; E[2].y = 64;
-;
-	.dbg	line, "game.c", 242
-	lda     #$40
-	sta     _E+9
-;
-; E[2].width = 15;
-;
-	.dbg	line, "game.c", 243
-	lda     #$0F
-	sta     _E+10
-;
-; E[2].height = 15;
-;
-	.dbg	line, "game.c", 244
-	sta     _E+11
-;
-; numberOfE = 3;
-;
-	.dbg	line, "game.c", 248
-	ldx     #$00
-	lda     #$03
-	sta     _numberOfE
-	stx     _numberOfE+1
+	.dbg	line, "game.c", 235
+	lda     #$00
+	sta     _i
+	sta     _i+1
+L0002:	lda     _i
+	cmp     _numberOfE
+	lda     _i+1
+	sbc     _numberOfE+1
+	bvc     L0013
+	eor     #$80
+L0013:	bmi     L0018
 ;
 ; }
 ;
-	.dbg	line, "game.c", 251
+	.dbg	line, "game.c", 271
 	rts
+;
+; E[i].width = 15;//set size of enemy
+;
+	.dbg	line, "game.c", 236
+L0018:	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	clc
+	adc     #<(_E)
+	sta     ptr1
+	txa
+	adc     #>(_E)
+	sta     ptr1+1
+	lda     #$0F
+	ldy     #$02
+	sta     (ptr1),y
+;
+; E[i].height = 15;
+;
+	.dbg	line, "game.c", 237
+	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	clc
+	adc     #<(_E)
+	sta     ptr1
+	txa
+	adc     #>(_E)
+	sta     ptr1+1
+	lda     #$0F
+	iny
+	sta     (ptr1),y
+;
+; E[i].x = 4*rand8();
+;
+	.dbg	line, "game.c", 240
+L0007:	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	clc
+	adc     #<(_E)
+	tay
+	txa
+	adc     #>(_E)
+	tax
+	tya
+	jsr     pushax
+	jsr     _rand8
+	asl     a
+	asl     a
+	ldy     #$00
+	jsr     staspidx
+;
+; }while(!(E[i].x <= 224 && E[i].x >= 16));
+;
+	.dbg	line, "game.c", 241
+	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	sta     ptr1
+	txa
+	clc
+	adc     #>(_E)
+	sta     ptr1+1
+	ldy     #<(_E)
+	lda     (ptr1),y
+	cmp     #$E1
+	bcs     L0014
+	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	sta     ptr1
+	txa
+	clc
+	adc     #>(_E)
+	sta     ptr1+1
+	ldy     #<(_E)
+	lda     (ptr1),y
+	cmp     #$10
+	bcs     L0015
+L0014:	lda     #$00
+	jmp     L000C
+L0015:	lda     #$01
+L000C:	jsr     bnega
+	bne     L0007
+;
+; E[i].y = 4*rand8();
+;
+	.dbg	line, "game.c", 244
+L0008:	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	clc
+	adc     #<(_E)
+	tay
+	txa
+	adc     #>(_E)
+	tax
+	tya
+	jsr     pushax
+	jsr     _rand8
+	asl     a
+	asl     a
+	ldy     #$01
+	jsr     staspidx
+;
+; }while(!((E[i].y <= 208) && (E[i].y >= 32)));
+;
+	.dbg	line, "game.c", 245
+	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	clc
+	adc     #<(_E)
+	sta     ptr1
+	txa
+	adc     #>(_E)
+	sta     ptr1+1
+	ldy     #$01
+	lda     (ptr1),y
+	cmp     #$D1
+	bcs     L0016
+	lda     _i
+	ldx     _i+1
+	jsr     aslax2
+	clc
+	adc     #<(_E)
+	sta     ptr1
+	txa
+	adc     #>(_E)
+	sta     ptr1+1
+	lda     (ptr1),y
+	cmp     #$20
+	bcs     L0017
+L0016:	lda     #$00
+	jmp     L0012
+L0017:	tya
+L0012:	jsr     bnega
+	bne     L0008
+;
+; for(i = 0; i < numberOfE; i++){
+;
+	.dbg	line, "game.c", 235
+	inc     _i
+	jne     L0002
+	inc     _i+1
+	jmp     L0002
 
 	.dbg	line
 .endproc
@@ -4096,7 +4187,7 @@ L000A:	rts
 ;
 ; for(i = 0; i < health; i++){
 ;
-	.dbg	line, "game.c", 254
+	.dbg	line, "game.c", 274
 	lda     #$00
 	sta     _i
 	sta     _i+1
@@ -4110,7 +4201,7 @@ L0007:	bpl     L0003
 ;
 ; oam_spr((i*8), 0, 0x80, 1);
 ;
-	.dbg	line, "game.c", 255
+	.dbg	line, "game.c", 275
 	jsr     decsp3
 	lda     _i
 	asl     a
@@ -4129,7 +4220,7 @@ L0007:	bpl     L0003
 ;
 ; for(i = 0; i < health; i++){
 ;
-	.dbg	line, "game.c", 254
+	.dbg	line, "game.c", 274
 	inc     _i
 	bne     L0002
 	inc     _i+1
@@ -4137,7 +4228,7 @@ L0007:	bpl     L0003
 ;
 ; }
 ;
-	.dbg	line, "game.c", 258
+	.dbg	line, "game.c", 278
 L0003:	rts
 
 	.dbg	line
@@ -4158,7 +4249,7 @@ L0003:	rts
 ;
 ; if(health <= 0){
 ;
-	.dbg	line, "game.c", 272
+	.dbg	line, "game.c", 292
 	lda     _health
 	cmp     #$01
 	lda     _health+1
@@ -4169,12 +4260,12 @@ L0003:	bmi     L0009
 ;
 ; }
 ;
-	.dbg	line, "game.c", 312
+	.dbg	line, "game.c", 332
 	rts
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 274
+	.dbg	line, "game.c", 294
 L0009:	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -4182,24 +4273,24 @@ L0009:	lda     #$04
 ;
 ; oam_clear();//clear sprite buffer
 ;
-	.dbg	line, "game.c", 278
+	.dbg	line, "game.c", 298
 	jsr     _oam_clear
 ;
 ; clearScreen();
 ;
-	.dbg	line, "game.c", 279
+	.dbg	line, "game.c", 299
 	jsr     _clearScreen
 ;
 ; vram_adr(NTADR_A(12,14)); // screen is 32 x 30 tiles
 ;
-	.dbg	line, "game.c", 280
+	.dbg	line, "game.c", 300
 	ldx     #$21
 	lda     #$CC
 	jsr     _vram_adr
 ;
 ; vram_write(text,sizeof(text));
 ;
-	.dbg	line, "game.c", 281
+	.dbg	line, "game.c", 301
 	lda     #<(_text)
 	ldx     #>(_text)
 	jsr     pushax
@@ -4209,32 +4300,32 @@ L0009:	lda     #$04
 ;
 ; pal_bright(4); // back to normal brightness 
 ;
-	.dbg	line, "game.c", 282
+	.dbg	line, "game.c", 302
 	lda     #$04
 	jsr     _pal_bright
 ;
 ; i = 0;
 ;
-	.dbg	line, "game.c", 283
+	.dbg	line, "game.c", 303
 	lda     #$00
 	sta     _i
 	sta     _i+1
 ;
 ; ppu_wait_nmi();
 ;
-	.dbg	line, "game.c", 285
+	.dbg	line, "game.c", 305
 L0004:	jsr     _ppu_wait_nmi
 ;
 ; i++;
 ;
-	.dbg	line, "game.c", 286
+	.dbg	line, "game.c", 306
 	inc     _i
 	bne     L0007
 	inc     _i+1
 ;
 ; }while(i <= 180);
 ;
-	.dbg	line, "game.c", 287
+	.dbg	line, "game.c", 307
 L0007:	lda     _i
 	cmp     #$B5
 	lda     _i+1
@@ -4245,7 +4336,7 @@ L0008:	bmi     L0004
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 292
+	.dbg	line, "game.c", 312
 	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -4253,23 +4344,23 @@ L0008:	bmi     L0004
 ;
 ; ppu_off(); // screen off //make this better and fade in/out after saying you died
 ;
-	.dbg	line, "game.c", 293
+	.dbg	line, "game.c", 313
 	jsr     _ppu_off
 ;
 ; clearScreen();
 ;
-	.dbg	line, "game.c", 294
+	.dbg	line, "game.c", 314
 	jsr     _clearScreen
 ;
 ; which_bg = 0;
 ;
-	.dbg	line, "game.c", 295
+	.dbg	line, "game.c", 315
 	lda     #$00
 	sta     _which_bg
 ;
 ; mapPos = center;
 ;
-	.dbg	line, "game.c", 296
+	.dbg	line, "game.c", 316
 	lda     _center+1
 	sta     _mapPos+1
 	lda     _center
@@ -4277,12 +4368,12 @@ L0008:	bmi     L0004
 ;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 298
+	.dbg	line, "game.c", 318
 	jsr     _draw_bg
 ;
 ; health = maxHealth;
 ;
-	.dbg	line, "game.c", 299
+	.dbg	line, "game.c", 319
 	lda     _maxHealth+1
 	sta     _health+1
 	lda     _maxHealth
@@ -4290,7 +4381,7 @@ L0008:	bmi     L0004
 ;
 ; stamina = maxStam;
 ;
-	.dbg	line, "game.c", 300
+	.dbg	line, "game.c", 320
 	lda     _maxStam+1
 	sta     _stamina+1
 	lda     _maxStam
@@ -4298,19 +4389,19 @@ L0008:	bmi     L0004
 ;
 ; knight.x = 120;
 ;
-	.dbg	line, "game.c", 301
+	.dbg	line, "game.c", 321
 	lda     #$78
 	sta     _knight
 ;
 ; knight.y = 112;
 ;
-	.dbg	line, "game.c", 302
+	.dbg	line, "game.c", 322
 	lda     #$70
 	sta     _knight+1
 ;
 ; flasks = 3;
 ;
-	.dbg	line, "game.c", 303
+	.dbg	line, "game.c", 323
 	ldx     #$00
 	lda     #$03
 	sta     _flasks
@@ -4318,21 +4409,21 @@ L0008:	bmi     L0004
 ;
 ; roll = 0;
 ;
-	.dbg	line, "game.c", 304
+	.dbg	line, "game.c", 324
 	txa
 	sta     _roll
 	sta     _roll+1
 ;
 ; dir = 3;
 ;
-	.dbg	line, "game.c", 305
+	.dbg	line, "game.c", 325
 	lda     #$03
 	sta     _dir
 	stx     _dir+1
 ;
 ; playerSprite = downSprite;
 ;
-	.dbg	line, "game.c", 306
+	.dbg	line, "game.c", 326
 	lda     #>(_downSprite)
 	sta     _playerSprite+1
 	lda     #<(_downSprite)
@@ -4340,17 +4431,17 @@ L0008:	bmi     L0004
 ;
 ; ppu_wait_nmi();
 ;
-	.dbg	line, "game.c", 307
+	.dbg	line, "game.c", 327
 	jsr     _ppu_wait_nmi
 ;
 ; ppu_on_all();
 ;
-	.dbg	line, "game.c", 308
+	.dbg	line, "game.c", 328
 	jsr     _ppu_on_all
 ;
 ; pal_bright(4); // back to normal brightness 
 ;
-	.dbg	line, "game.c", 309
+	.dbg	line, "game.c", 329
 	lda     #$04
 	jmp     _pal_bright
 
@@ -4372,14 +4463,14 @@ L0008:	bmi     L0004
 ;
 ; if(knight.y < 13){
 ;
-	.dbg	line, "game.c", 315
+	.dbg	line, "game.c", 335
 	lda     _knight+1
 	cmp     #$0D
 	bcs     L000C
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 316
+	.dbg	line, "game.c", 336
 	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -4387,13 +4478,13 @@ L0008:	bmi     L0004
 ;
 ; knight.y = 221;
 ;
-	.dbg	line, "game.c", 317
+	.dbg	line, "game.c", 337
 	lda     #$DD
 	sta     _knight+1
 ;
 ; mapPos -= mapWidth;
 ;
-	.dbg	line, "game.c", 318
+	.dbg	line, "game.c", 338
 	lda     _mapWidth
 	eor     #$FF
 	sec
@@ -4406,12 +4497,12 @@ L0008:	bmi     L0004
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 319
+	.dbg	line, "game.c", 339
 	lda     _mapPos
 ;
 ; else if(knight.y > 221){
 ;
-	.dbg	line, "game.c", 327
+	.dbg	line, "game.c", 347
 	jmp     L001B
 L000C:	lda     _knight+1
 	cmp     #$DE
@@ -4419,7 +4510,7 @@ L000C:	lda     _knight+1
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 328
+	.dbg	line, "game.c", 348
 	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -4427,13 +4518,13 @@ L000C:	lda     _knight+1
 ;
 ; knight.y = 13;
 ;
-	.dbg	line, "game.c", 329
+	.dbg	line, "game.c", 349
 	lda     #$0D
 	sta     _knight+1
 ;
 ; mapPos += mapWidth;
 ;
-	.dbg	line, "game.c", 330
+	.dbg	line, "game.c", 350
 	lda     _mapWidth
 	clc
 	adc     _mapPos
@@ -4444,12 +4535,12 @@ L000C:	lda     _knight+1
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 331
+	.dbg	line, "game.c", 351
 	lda     _mapPos
 ;
 ; else if(knight.x <= 3 ){
 ;
-	.dbg	line, "game.c", 339
+	.dbg	line, "game.c", 359
 	jmp     L001B
 L000D:	lda     _knight
 	cmp     #$04
@@ -4457,7 +4548,7 @@ L000D:	lda     _knight
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 340
+	.dbg	line, "game.c", 360
 	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -4465,13 +4556,13 @@ L000D:	lda     _knight
 ;
 ; knight.x = 236;
 ;
-	.dbg	line, "game.c", 341
+	.dbg	line, "game.c", 361
 	lda     #$EC
 	sta     _knight
 ;
 ; mapPos=mapPos-1;
 ;
-	.dbg	line, "game.c", 342
+	.dbg	line, "game.c", 362
 	lda     _mapPos
 	ldx     _mapPos+1
 	sec
@@ -4481,7 +4572,7 @@ L000D:	lda     _knight
 ;
 ; else if(knight.x >= 237){
 ;
-	.dbg	line, "game.c", 351
+	.dbg	line, "game.c", 371
 	jmp     L000A
 L000E:	lda     _knight
 	cmp     #$ED
@@ -4489,7 +4580,7 @@ L000E:	lda     _knight
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 352
+	.dbg	line, "game.c", 372
 	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -4497,13 +4588,13 @@ L000E:	lda     _knight
 ;
 ; knight.x = 4;//can't go less than 0, so have to be a pixel over
 ;
-	.dbg	line, "game.c", 353
+	.dbg	line, "game.c", 373
 	lda     #$04
 	sta     _knight
 ;
 ; mapPos=mapPos+1;
 ;
-	.dbg	line, "game.c", 354
+	.dbg	line, "game.c", 374
 	lda     _mapPos
 	ldx     _mapPos+1
 	clc
@@ -4515,7 +4606,7 @@ L000A:	sta     _mapPos
 ;
 ; which_bg = worldMap[mapPos];
 ;
-	.dbg	line, "game.c", 355
+	.dbg	line, "game.c", 375
 L001B:	sta     ptr1
 	lda     _mapPos+1
 	clc
@@ -4527,33 +4618,33 @@ L001B:	sta     ptr1
 ;
 ; draw_bg();
 ;
-	.dbg	line, "game.c", 357
+	.dbg	line, "game.c", 377
 	jsr     _draw_bg
 ;
 ; drawSprites();
 ;
-	.dbg	line, "game.c", 358
+	.dbg	line, "game.c", 378
 	jsr     _drawSprites
 ;
 ; ppu_wait_nmi();
 ;
-	.dbg	line, "game.c", 359
+	.dbg	line, "game.c", 379
 	jsr     _ppu_wait_nmi
 ;
 ; pal_bright(4); // back to normal brightness 
 ;
-	.dbg	line, "game.c", 360
+	.dbg	line, "game.c", 380
 	lda     #$04
 	jsr     _pal_bright
 ;
 ; loadRoomData();
 ;
-	.dbg	line, "game.c", 361
+	.dbg	line, "game.c", 381
 	jmp     _loadRoomData
 ;
 ; }
 ;
-	.dbg	line, "game.c", 365
+	.dbg	line, "game.c", 385
 L0009:	rts
 
 	.dbg	line
@@ -4574,38 +4665,38 @@ L0009:	rts
 ;
 ; ppu_off(); // screen off
 ;
-	.dbg	line, "game.c", 261
+	.dbg	line, "game.c", 281
 	jsr     _ppu_off
 ;
 ; vram_adr(NTADR_A(0,0));//set to top corner
 ;
-	.dbg	line, "game.c", 262
+	.dbg	line, "game.c", 282
 	ldx     #$20
 	lda     #$00
 	jsr     _vram_adr
 ;
 ; i = 0;
 ;
-	.dbg	line, "game.c", 263
+	.dbg	line, "game.c", 283
 	lda     #$00
 	sta     _i
 	sta     _i+1
 ;
 ; vram_put(0);
 ;
-	.dbg	line, "game.c", 265
+	.dbg	line, "game.c", 285
 L0008:	jsr     _vram_put
 ;
 ; i++;
 ;
-	.dbg	line, "game.c", 266
+	.dbg	line, "game.c", 286
 	inc     _i
 	bne     L0005
 	inc     _i+1
 ;
 ; }while(i < 960);//32*30
 ;
-	.dbg	line, "game.c", 267
+	.dbg	line, "game.c", 287
 L0005:	lda     _i
 	cmp     #$C0
 	lda     _i+1
@@ -4618,7 +4709,7 @@ L0006:	asl     a
 ;
 ; ppu_on_all();
 ;
-	.dbg	line, "game.c", 268
+	.dbg	line, "game.c", 288
 	jmp     _ppu_on_all
 
 	.dbg	line
@@ -4639,7 +4730,7 @@ L0006:	asl     a
 ;
 ; pal_fade_to(4,0); // fade to black
 ;
-	.dbg	line, "game.c", 368
+	.dbg	line, "game.c", 388
 	lda     #$04
 	jsr     pusha
 	lda     #$00
@@ -4647,31 +4738,31 @@ L0006:	asl     a
 ;
 ; oam_clear();//clear sprite buffer
 ;
-	.dbg	line, "game.c", 370
+	.dbg	line, "game.c", 390
 	jsr     _oam_clear
 ;
 ; clearScreen();
 ;
-	.dbg	line, "game.c", 371
+	.dbg	line, "game.c", 391
 	jsr     _clearScreen
 ;
 ; loop = 0;
 ;
-	.dbg	line, "game.c", 372
+	.dbg	line, "game.c", 392
 	lda     #$00
 	sta     _loop
 	sta     _loop+1
 ;
 ; vram_adr(NTADR_A(12,14)); // screen is 32 x 30 tiles
 ;
-	.dbg	line, "game.c", 373
+	.dbg	line, "game.c", 393
 	ldx     #$21
 	lda     #$CC
 	jsr     _vram_adr
 ;
 ; vram_write(winTxt,sizeof(winTxt));
 ;
-	.dbg	line, "game.c", 374
+	.dbg	line, "game.c", 394
 	lda     #<(_winTxt)
 	ldx     #>(_winTxt)
 	jsr     pushax
@@ -4681,7 +4772,7 @@ L0006:	asl     a
 ;
 ; pal_bright(4); // back to normal brightness 
 ;
-	.dbg	line, "game.c", 375
+	.dbg	line, "game.c", 395
 	lda     #$04
 	jmp     _pal_bright
 
@@ -4703,7 +4794,7 @@ L0006:	asl     a
 ;
 ; if(which_bg == 9) {numberOfE = 0;}
 ;
-	.dbg	line, "game.c", 381
+	.dbg	line, "game.c", 401
 	ldx     #$00
 	lda     _which_bg
 	cmp     #$09
@@ -4712,7 +4803,7 @@ L0006:	asl     a
 ;
 ; else{numberOfE = 3;}
 ;
-	.dbg	line, "game.c", 382
+	.dbg	line, "game.c", 402
 	jmp     L0006
 L0005:	lda     #$03
 L0006:	sta     _numberOfE
@@ -4720,7 +4811,7 @@ L0006:	sta     _numberOfE
 ;
 ; }
 ;
-	.dbg	line, "game.c", 383
+	.dbg	line, "game.c", 403
 	rts
 
 	.dbg	line
@@ -4741,7 +4832,7 @@ L0006:	sta     _numberOfE
 ;
 ; if(stamina < maxStam && regenTimer <= 0){
 ;
-	.dbg	line, "game.c", 386
+	.dbg	line, "game.c", 406
 	lda     _stamina
 	cmp     _maxStam
 	lda     _stamina+1
@@ -4759,14 +4850,14 @@ L0004:	bpl     L0002
 ;
 ; stamina++;
 ;
-	.dbg	line, "game.c", 387
+	.dbg	line, "game.c", 407
 	inc     _stamina
 	bne     L0007
 	inc     _stamina+1
 ;
 ; regenTimer = timerSpeed;
 ;
-	.dbg	line, "game.c", 388
+	.dbg	line, "game.c", 408
 L0007:	lda     _timerSpeed+1
 	sta     _regenTimer+1
 	lda     _timerSpeed
@@ -4774,7 +4865,7 @@ L0007:	lda     _timerSpeed+1
 ;
 ; }else{regenTimer -= 1;}
 ;
-	.dbg	line, "game.c", 389
+	.dbg	line, "game.c", 409
 	jmp     L0014
 L0002:	lda     _regenTimer
 	sec
@@ -4785,7 +4876,7 @@ L0002:	lda     _regenTimer
 ;
 ; for(i = 0; i < stamina; i++){
 ;
-	.dbg	line, "game.c", 391
+	.dbg	line, "game.c", 411
 L0014:	lda     #$00
 	sta     _i
 	sta     _i+1
@@ -4799,7 +4890,7 @@ L0010:	bpl     L000B
 ;
 ; oam_spr((i*8), 8, 0x90, 1);
 ;
-	.dbg	line, "game.c", 392
+	.dbg	line, "game.c", 412
 	jsr     decsp3
 	lda     _i
 	asl     a
@@ -4818,7 +4909,7 @@ L0010:	bpl     L000B
 ;
 ; for(i = 0; i < stamina; i++){
 ;
-	.dbg	line, "game.c", 391
+	.dbg	line, "game.c", 411
 	inc     _i
 	bne     L000A
 	inc     _i+1
@@ -4826,7 +4917,7 @@ L0010:	bpl     L000B
 ;
 ; }
 ;
-	.dbg	line, "game.c", 394
+	.dbg	line, "game.c", 414
 L000B:	rts
 
 	.dbg	line
@@ -4847,42 +4938,19 @@ L000B:	rts
 ;
 ; if(pad1_new & PAD_SELECT){
 ;
-	.dbg	line, "game.c", 451
+	.dbg	line, "game.c", 471
 	lda     _pad1_new
 	and     #$20
 	beq     L0002
 ;
-; health -= 1;
+; draw_bg();
 ;
-	.dbg	line, "game.c", 452
-	lda     _health
-	sec
-	sbc     #$01
-	sta     _health
-	bcs     L0003
-	dec     _health+1
-;
-; stamina -=1;
-;
-	.dbg	line, "game.c", 453
-L0003:	lda     _stamina
-	sec
-	sbc     #$01
-	sta     _stamina
-	bcs     L0004
-	dec     _stamina+1
-;
-; regenTimer = timerSpeed;
-;
-	.dbg	line, "game.c", 454
-L0004:	lda     _timerSpeed+1
-	sta     _regenTimer+1
-	lda     _timerSpeed
-	sta     _regenTimer
+	.dbg	line, "game.c", 472
+	jmp     _draw_bg
 ;
 ; }
 ;
-	.dbg	line, "game.c", 458
+	.dbg	line, "game.c", 476
 L0002:	rts
 
 	.dbg	line
@@ -4903,7 +4971,7 @@ L0002:	rts
 ;
 ; if(pad1_new & PAD_START && flasks > 0 && roll == 0){
 ;
-	.dbg	line, "game.c", 436
+	.dbg	line, "game.c", 456
 	lda     _pad1_new
 	and     #$10
 	beq     L000D
@@ -4921,7 +4989,7 @@ L000D:	rts
 ;
 ; flasks -=1;
 ;
-	.dbg	line, "game.c", 437
+	.dbg	line, "game.c", 457
 L000E:	lda     _flasks
 	sec
 	sbc     #$01
@@ -4931,7 +4999,7 @@ L000E:	lda     _flasks
 ;
 ; health += 4;
 ;
-	.dbg	line, "game.c", 438
+	.dbg	line, "game.c", 458
 L0008:	lda     #$04
 	clc
 	adc     _health
@@ -4941,7 +5009,7 @@ L0008:	lda     #$04
 ;
 ; if (health > maxHealth){health=maxHealth;}//Ensure no overheal
 ;
-	.dbg	line, "game.c", 439
+	.dbg	line, "game.c", 459
 L0009:	lda     _health
 	ldx     _health+1
 	jsr     pushax
@@ -4957,7 +5025,7 @@ L0009:	lda     _health
 ;
 ; mapTiles[35] = 48+flasks; //Update the mapTiles to have the correct number of flasks
 ;
-	.dbg	line, "game.c", 442
+	.dbg	line, "game.c", 462
 L000A:	lda     _flasks
 	clc
 	adc     #$30
@@ -4965,7 +5033,7 @@ L000A:	lda     _flasks
 ;
 ; address = get_ppu_addr(0, 0xF0, 0); //Address of the flask
 ;
-	.dbg	line, "game.c", 443
+	.dbg	line, "game.c", 463
 	jsr     decsp2
 	lda     #$00
 	ldy     #$01
@@ -4980,7 +5048,7 @@ L000A:	lda     _flasks
 ;
 ; buffer_1_mt(address, 7); // redraw just the flasks - no need to update entire screen + doesn't require the screen to be turned off
 ;
-	.dbg	line, "game.c", 444
+	.dbg	line, "game.c", 464
 	jsr     pushax
 	lda     #$07
 	jmp     _buffer_1_mt
@@ -5003,14 +5071,14 @@ L000A:	lda     _flasks
 ;
 ; if(pad1_new & PAD_A ){
 ;
-	.dbg	line, "game.c", 397
+	.dbg	line, "game.c", 417
 	lda     _pad1_new
 	and     #$80
 	beq     L0003
 ;
 ; if(stamina >= 1){
 ;
-	.dbg	line, "game.c", 398
+	.dbg	line, "game.c", 418
 	lda     _stamina
 	cmp     #$01
 	lda     _stamina+1
@@ -5021,13 +5089,13 @@ L0004:	bpl     L0003
 ;
 ; switch(dir){
 ;
-	.dbg	line, "game.c", 399
+	.dbg	line, "game.c", 419
 	lda     _dir
 	ldx     _dir+1
 ;
 ; }
 ;
-	.dbg	line, "game.c", 412
+	.dbg	line, "game.c", 432
 	cpx     #$00
 	bne     L0006
 	cmp     #$01
@@ -5042,43 +5110,43 @@ L0004:	bpl     L0003
 ;
 ; playerSprite=upAttSprite;
 ;
-	.dbg	line, "game.c", 401
+	.dbg	line, "game.c", 421
 L0007:	lda     #>(_upAttSprite)
 	sta     _playerSprite+1
 	lda     #<(_upAttSprite)
 ;
 ; break;
 ;
-	.dbg	line, "game.c", 402
+	.dbg	line, "game.c", 422
 	jmp     L000C
 ;
 ; playerSprite=rightAttSprite;
 ;
-	.dbg	line, "game.c", 404
+	.dbg	line, "game.c", 424
 L0008:	lda     #>(_rightAttSprite)
 	sta     _playerSprite+1
 	lda     #<(_rightAttSprite)
 ;
 ; break;
 ;
-	.dbg	line, "game.c", 405
+	.dbg	line, "game.c", 425
 	jmp     L000C
 ;
 ; playerSprite=downAttSprite;
 ;
-	.dbg	line, "game.c", 407
+	.dbg	line, "game.c", 427
 L0009:	lda     #>(_downAttSprite)
 	sta     _playerSprite+1
 	lda     #<(_downAttSprite)
 ;
 ; break;
 ;
-	.dbg	line, "game.c", 408
+	.dbg	line, "game.c", 428
 	jmp     L000C
 ;
 ; playerSprite=leftAttSprite;
 ;
-	.dbg	line, "game.c", 410
+	.dbg	line, "game.c", 430
 L000A:	lda     #>(_leftAttSprite)
 	sta     _playerSprite+1
 	lda     #<(_leftAttSprite)
@@ -5086,7 +5154,7 @@ L000C:	sta     _playerSprite
 ;
 ; stamina-=1;
 ;
-	.dbg	line, "game.c", 413
+	.dbg	line, "game.c", 433
 L0006:	lda     _stamina
 	sec
 	sbc     #$01
@@ -5096,7 +5164,7 @@ L0006:	lda     _stamina
 ;
 ; }
 ;
-	.dbg	line, "game.c", 417
+	.dbg	line, "game.c", 437
 L0003:	rts
 
 	.dbg	line
@@ -5117,14 +5185,14 @@ L0003:	rts
 ;
 ; if(pad1_new & PAD_B){
 ;
-	.dbg	line, "game.c", 420
+	.dbg	line, "game.c", 440
 	lda     _pad1_new
 	and     #$40
 	beq     L0003
 ;
 ; if (stamina >= 1){
 ;
-	.dbg	line, "game.c", 421
+	.dbg	line, "game.c", 441
 	lda     _stamina
 	cmp     #$01
 	lda     _stamina+1
@@ -5135,7 +5203,7 @@ L0004:	bpl     L0003
 ;
 ; stamina -= 1;
 ;
-	.dbg	line, "game.c", 422
+	.dbg	line, "game.c", 442
 	lda     _stamina
 	sec
 	sbc     #$01
@@ -5145,7 +5213,7 @@ L0004:	bpl     L0003
 ;
 ; roll = 1;
 ;
-	.dbg	line, "game.c", 423
+	.dbg	line, "game.c", 443
 L0005:	ldx     #$00
 	lda     #$01
 	sta     _roll
@@ -5153,7 +5221,7 @@ L0005:	ldx     #$00
 ;
 ; playerSprite = rollSprite;
 ;
-	.dbg	line, "game.c", 424
+	.dbg	line, "game.c", 444
 	lda     #>(_rollSprite)
 	sta     _playerSprite+1
 	lda     #<(_rollSprite)
@@ -5161,14 +5229,14 @@ L0005:	ldx     #$00
 ;
 ; iFrame = 18;
 ;
-	.dbg	line, "game.c", 425
+	.dbg	line, "game.c", 445
 	lda     #$12
 	sta     _iFrame
 	stx     _iFrame+1
 ;
 ; }
 ;
-	.dbg	line, "game.c", 431
+	.dbg	line, "game.c", 451
 L0003:	rts
 
 	.dbg	line

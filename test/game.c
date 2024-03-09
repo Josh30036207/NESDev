@@ -228,24 +228,44 @@ void bgCollision(){
 }
 
 void loadEnemyData(void){ //need to load enemies from map //not fully implimented yet
-	E[0].x = 64;
-	E[0].y = 64;
-	E[0].width = 15;
-	E[0].height = 15;
-
-	E[1].x = 128;
-	E[1].y = 128;
-	E[1].width = 15;
-	E[1].height = 15;
-
-	E[2].x = 420;
-	E[2].y = 64;
-	E[2].width = 15;
-	E[2].height = 15;
-
 	
 	// which_bg holds a char with the level number. e.g. map_1 = 1
-	numberOfE = 3;
+	//numberOfE = 3;
+
+	for(i = 0; i < numberOfE; i++){
+		E[i].width = 15;//set size of enemy
+		E[i].height = 15;
+
+		do{
+		 	E[i].x = 4*rand8();
+		}while(!(E[i].x <= 224 && E[i].x >= 16));
+
+		do{
+			E[i].y = 4*rand8();
+		}while(!((E[i].y <= 208) && (E[i].y >= 32)));
+		
+		//TODO check if out of bounds, or on top of each other
+
+		
+		
+	}
+	// E[0].x = 64;
+	// E[0].y = 64;
+	// E[0].width = 15;
+	// E[0].height = 15;
+
+	// E[1].x = 128;
+	// E[1].y = 128;
+	// E[1].width = 15;
+	// E[1].height = 15;
+
+	// E[2].x = 420;
+	// E[2].y = 64;
+	// E[2].width = 15;
+	// E[2].height = 15;
+
+	
+	
 	
 
 }
@@ -447,11 +467,9 @@ void stBtn(void){//heal
 	}	
 }
 
-void selBtn(void){//menu //Currently used to test Health/Stamina
+void selBtn(void){//menu //Currently used to test enemy spawns
 	if(pad1_new & PAD_SELECT){
-		health -= 1;
-		stamina -=1;
-		regenTimer = timerSpeed;
+		draw_bg();
 		
 	}
 	

@@ -103,5 +103,4 @@ unsigned char x;
 unsigned char y;
 unsigned char index;
 
-void fskUpt(void);
-unsigned char coordinates;
+int posChk = 0;
