@@ -28,6 +28,7 @@ unsigned char temp_y;
 const unsigned char *playerSprite;
 
 int i;
+int j;
 int health = 8;
 int stamina = 8;
 int maxHealth = 8;

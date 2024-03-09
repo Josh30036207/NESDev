@@ -84,12 +84,14 @@ void move (void){
 			knight.x -= 2;
 			rHVal = -3;
 			
+
 		}
 		else if (pad1 & PAD_RIGHT){
 			playerSprite = rightSprite;
 			dir = 2;
 			knight.x += 2;
 			rHVal = 3;
+
 		}else{rHVal = 0;}
 		bgCollision();
 		if(collision_R) knight.x -= 2;
@@ -99,12 +101,14 @@ void move (void){
 			dir = 1;
 			knight.y -= 2;
 			rVVal = -3;
+
 		}
 		else if (pad1 & PAD_DOWN){
 			playerSprite = downSprite;
 			dir = 3;
 			knight.y += 2;
 			rVVal = 3;
+
 		}else{rVVal = 0; }
 		bgCollision();
 		if(collision_D) knight.y -= 2;
@@ -139,6 +143,7 @@ void testCollision(void){//tests collisions against sprites
 		// change the BG color, if sprites are touching
 		if (collision){
 			E[i].y++;
+			
 			if (iFrame <= 0 && roll == 0){
 				health -= 1;
 				iFrame = 26;
@@ -147,9 +152,21 @@ void testCollision(void){//tests collisions against sprites
 			
 		}
 	}
+
+	for(i = 0; i < numberOfE; i++){//check enemy sprite collisions
+		for(j = 1; j < numberOfE; j++){
+			collision = check_collision(&E[i], &E[i+j]); 
+			// change the BG color, if sprites are touching
+			if(collision){
+				E[j].y++;//move it down
+			}
+			
+		}
+	}
 	if(which_bg == 9){
 		collision = check_collision(&knight, &winBlock);
-		 if (collision){win();}}
+		 if (collision){win();}
+	}
 }
 
 
@@ -227,14 +244,15 @@ void bgCollision(){
 	}
 }
 
-void loadEnemyData(void){ //need to load enemies from map //not fully implimented yet
+void loadEnemyData(void){ //loads random enemy positions
 	
 	// which_bg holds a char with the level number. e.g. map_1 = 1
 	//numberOfE = 3;
-
+	loadRoomData();
 	for(i = 0; i < numberOfE; i++){
 		E[i].width = 15;//set size of enemy
 		E[i].height = 15;
+
 
 		do{
 		 	E[i].x = 4*rand8();
@@ -242,32 +260,8 @@ void loadEnemyData(void){ //need to load enemies from map //not fully implimente
 
 		do{
 			E[i].y = 4*rand8();
-		}while(!((E[i].y <= 208) && (E[i].y >= 32)));
-		
-		//TODO check if out of bounds, or on top of each other
-
-		
-		
-	}
-	// E[0].x = 64;
-	// E[0].y = 64;
-	// E[0].width = 15;
-	// E[0].height = 15;
-
-	// E[1].x = 128;
-	// E[1].y = 128;
-	// E[1].width = 15;
-	// E[1].height = 15;
-
-	// E[2].x = 420;
-	// E[2].y = 64;
-	// E[2].width = 15;
-	// E[2].height = 15;
-
-	
-	
-	
-
+		}while(!((E[i].y <= 208) && (E[i].y >= 32)));	
+	}	
 }
 
 void updateHealth(void){
@@ -342,7 +336,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
-		loadRoomData();
+		
 	}
 	else if(knight.y > 221){
 		pal_fade_to(4,0); // fade to black
@@ -354,7 +348,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
-		loadRoomData();
+		
 	}
 	else if(knight.x <= 3 ){
 		pal_fade_to(4,0); // fade to black
@@ -366,7 +360,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
-		loadRoomData();
+		
 	}
 	else if(knight.x >= 237){
 		pal_fade_to(4,0); // fade to black
@@ -378,7 +372,7 @@ void nextRoom(void){ //currently just iterates the background - need to change t
 		drawSprites();
 		ppu_wait_nmi();
 		pal_bright(4); // back to normal brightness	
-		loadRoomData();
+		
 	}
 	
 	
@@ -480,7 +474,7 @@ void selBtn(void){//menu //Currently used to test enemy spawns
 //Player Roll //DONE
 //Player Attack //Change enemy load first
 //Player Heal //DONE 
-//Enemy Random Spawn
+//Enemy Random Spawn//DONE
 //Better Enemy Attack
 //Boss Fight
 //Better room load //DONE
