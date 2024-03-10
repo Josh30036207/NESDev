@@ -85,7 +85,7 @@ void selBtn(void); //Select
 void stBtn(void);//Start
 void aBtn(void);
 void bBtn(void);
-
+void eBgCol(void);
 
 char mapTiles[]={ //per row TTL, TR, BL, BR, Colour 
 	0, 0, 0, 0,  0,//Empty Space

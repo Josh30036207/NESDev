@@ -45,6 +45,7 @@ void main (void) {
 		move();//move the player
 		nextRoom();
 		testCollision();//sprite collisions
+		eBgCol();
 		drawSprites();
 		stBtn();
 		selBtn();
@@ -248,6 +249,8 @@ void bgCollision(){
 		++collision_L;
 		++collision_D;
 	}
+
+	
 }
 
 void loadEnemyData(void){ //loads random enemy positions
@@ -479,9 +482,64 @@ void selBtn(void){//menu //Currently Pause
 }
 
 
+void eBgCol(void){
+	//OK do the same for the enemies - Very slow may change, but as works rn will fix when it becomes an issue
+	for(i = 0; i < numberOfE; i++){//check enemy sprite collisions
+		
+		collision_L = 0;
+		collision_R = 0;
+		collision_U = 0;
+		collision_D = 0;
+		
+		temp_x = E[i].x; // left side
+		temp_y = E[i].y; // top side
+		
+		if(temp_y >= 0xf0) return;
+		// y out of range
+		
+		coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper left
+		if(c_map[coordinates]){ // find a corner in the collision map
+			++collision_L;
+			++collision_U;
+		}
+		
+		temp_x = E[i].x + E[i].width; // right side
+		
+		coordinates = (temp_x >> 4) + (temp_y & 0xf0); // upper right
+		if(c_map[coordinates]){
+			++collision_R;
+			++collision_U;
+		}
+		
+		temp_y = E[i].y + E[i].height; // bottom side
+		if(temp_y >= 0xf0) return;
+		// y out of range
+		
+		coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom right
+		if(c_map[coordinates]){
+			++collision_R;
+			++collision_D;
+		}
+		
+		temp_x = E[i].x; // left side
+		
+		coordinates = (temp_x >> 4) + (temp_y & 0xf0); // bottom left
+		if(c_map[coordinates]){
+			++collision_L;
+			++collision_D;
+		}
+
+
+		if(collision_D) E[i].y -= 2;
+		if(collision_U) E[i].y += 2;
+		if(collision_L) E[i].x += 2;
+		if(collision_R) E[i].x -= 2;
+	}
+};
+
 //TODO - Minimum
 //Player Roll //DONE
-//Player Attack //Change enemy load first
+//Player Attack //Change enemy load first//Enemy load done
 //Player Heal //DONE 
 //Enemy Random Spawn//DONE
 //Better Enemy Attack
