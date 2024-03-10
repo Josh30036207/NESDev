@@ -105,3 +105,4 @@ unsigned char y;
 unsigned char index;
 
 int posChk = 0;
+int pause = 0;

@@ -60,6 +60,12 @@ void main (void) {
 			roll = 0;
 			playerSprite = downSprite; dir = 3;
 		}
+
+		while (pause){ //pause
+			pad1 = pad_poll(0); //read first controller input
+			pad1_new = get_pad_new(0); // newly pressed button. do pad_poll first
+			selBtn();
+		}
 	}
 	while (1){ //prevents crashes on "win"
 		//hamburger
@@ -461,9 +467,12 @@ void stBtn(void){//heal
 	}	
 }
 
-void selBtn(void){//menu //Currently used to test enemy spawns
+void selBtn(void){//menu //Currently Pause
 	if(pad1_new & PAD_SELECT){
-		draw_bg();
+		if (pause == 0){
+			pause = 1;
+		}else{pause = 0;}
+		
 		
 	}
 	
