@@ -26,6 +26,7 @@ unsigned char temp_x;
 unsigned char temp_y;
 
 const unsigned char *playerSprite;
+const unsigned char *swordSpr;
 
 int i;
 int j;
@@ -43,6 +44,7 @@ int rVVal = 0;
 int dir = 3;
 int canMove = 1;
 int flasks = 3;
+int swdTime = 5;
 
 
  struct hollow { //basic entity
@@ -54,13 +56,13 @@ int flasks = 3;
 
 
 struct hollow knight = {40,62,15,15};
-struct hollow Enemy = {64, 147, 15, 15};
+struct hollow sword = {0, 0, 0, 0};
 int numberOfE = 3; // Can't use value for creating an array 
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 struct hollow tempE[3];
 
 struct hollow winBlock = {120, 112, 15, 7};
-
+struct hollow wolf = {120, 200, 32, 24};//BOSS 1
 
 unsigned char c_map[240];
 // collision map 
@@ -86,6 +88,7 @@ void stBtn(void);//Start
 void aBtn(void);
 void bBtn(void);
 void eBgCol(void);
+void wait(int time);
 
 char mapTiles[]={ //per row TTL, TR, BL, BR, Colour 
 	0, 0, 0, 0,  0,//Empty Space

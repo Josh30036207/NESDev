@@ -132,7 +132,7 @@ void drawSprites(void){
 
 	
 	{oam_meta_spr(knight.x, knight.y, playerSprite);}
-	
+	oam_meta_spr(sword.x, sword.y, swordSpr);
 	
 	if(which_bg == 9){
 		oam_meta_spr(winBlock.x, winBlock.y , fire);
@@ -402,7 +402,7 @@ void win(void){
 
 void loadRoomData(void){
 	if(which_bg == 9) {numberOfE = 0;}
-	else{numberOfE = 3;}
+	else{numberOfE = 2;}
 }
 
 void updateStamina(void){
@@ -422,17 +422,38 @@ void aBtn(void){//attack
 			switch(dir){
 				case 1:
 				playerSprite=upAttSprite;
+				swordSpr=srdU;
+				sword.y = knight.y-8;
+				sword.x = knight.x;
+				wait(swdTime);
+				playerSprite=upSprite;
 				break;
 				case 2:
 				playerSprite=rightAttSprite;
+				swordSpr=srdR;
+				sword.x = knight.x+16;
+				sword.y = knight.y;
+				wait(swdTime);
+				playerSprite=rightSprite;
 				break;
 				case 3:
 				playerSprite=downAttSprite;
+				swordSpr=srdD;
+				sword.y = knight.y+16;
+				sword.x = knight.x;
+				wait(swdTime);
+				playerSprite=downSprite;
 				break;
 				case 4:
 				playerSprite=leftAttSprite;
+				swordSpr=srdL;
+				sword.x = knight.x-8;
+				sword.y = knight.y;
+				wait(swdTime);
+				playerSprite=leftSprite;
 				break;
 			}
+			swordSpr=null;
 			stamina-=1;
 			//still need to draw rest of blade
 		}
@@ -470,14 +491,16 @@ void stBtn(void){//heal
 	}	
 }
 
-void selBtn(void){//menu //Currently Pause
+void selBtn(void){//menu //Currently Pause //ignore that currently testing
 	if(pad1_new & PAD_SELECT){
 		if (pause == 0){
 			pause = 1;
 		}else{pause = 0;}
 		
-		
 	}
+	// 	address = get_ppu_addr(0, 0xF0, 0x10); //Address of the flask
+	// 	buffer_1_mt(address, 7); // put metatile #0 here = blank grass
+	// }
 	
 }
 
@@ -536,6 +559,17 @@ void eBgCol(void){
 		if(collision_R) E[i].x -= 2;
 	}
 };
+
+void wait(time){
+	
+	while(time >= 0){
+		drawSprites();
+		updateHealth();
+		updateStamina();
+		ppu_wait_nmi();
+		time -= 1;
+	}
+}
 
 //TODO - Minimum
 //Player Roll //DONE

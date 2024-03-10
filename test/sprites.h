@@ -96,7 +96,68 @@ const unsigned char fire[]={
 	128
 };
 
+const unsigned char wolfL[]={
+	  0,  0,0x08,0,
+	  8,  0,0x09,0,
+	  16,  0,0x0A,0,
+	  24,  0,0x0B,0,
+	  0,  8,0x18,0,
+	  8,  8,0x19,0,
+	  16,  8,0x1A,0,
+	  23,  8,0x1B,0,
+	  0,  16,0x28,0,
+	  8,  16,0x29,0,
+	  16,  16,0x2A,0,
+	  23,  16,0x2B,0,
+	128
+};
 
+const unsigned char wolfR[]={
+	  24,  0,0x08,0|OAM_FLIP_H,
+	  16,  0,0x09,0|OAM_FLIP_H,
+	  8,  0,0x0A,0|OAM_FLIP_H,
+	  0,  0,0x0B,0|OAM_FLIP_H,
+
+	  24,  8,0x18,0|OAM_FLIP_H,
+	  16,  8,0x19,0|OAM_FLIP_H,
+	  8,  8,0x1A,0|OAM_FLIP_H,
+	  0,  8,0x1B,0|OAM_FLIP_H,
+
+	  24,  16,0x28,0|OAM_FLIP_H,
+	  16,  16,0x29,0|OAM_FLIP_H,
+	  8,  16,0x2A,0|OAM_FLIP_H,
+	  0,  16,0x2B,0|OAM_FLIP_H,
+
+	128
+};
+
+const unsigned char null[]={
+	128
+};
+
+const unsigned char srdU[]={
+	0,  0,0x36,0,
+	8,  0,0x37,0,
+	128
+};
+
+const unsigned char srdD[]={
+	0,  0,0x26,0|OAM_FLIP_V,
+	8,  0,0x27,0|OAM_FLIP_V,
+	128
+};
+
+const unsigned char srdR[]={
+	0,  0,0x46,0,
+	0,  8,0x56,0,
+	128
+};
+
+const unsigned char srdL[]={
+	0,  0,0x46,0|OAM_FLIP_H,
+	0,  8,0x56,0|OAM_FLIP_H,
+	128
+};
 
 //Colours
 #define BLACK 0x0f
