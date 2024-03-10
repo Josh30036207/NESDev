@@ -56,7 +56,7 @@ int swdTime = 5;
 
 
 struct hollow knight = {40,62,15,15};
-struct hollow sword = {0, 0, 0, 0};
+struct hollow sword = {0, 0, 15, 15};
 int numberOfE = 3; // Can't use value for creating an array 
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 struct hollow tempE[3];

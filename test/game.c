@@ -160,10 +160,25 @@ void testCollision(void){//tests collisions against sprites
 		}
 	}
 
+	//sword
+	for(i = 0; i < numberOfE; i++){
+		collision = check_collision(&sword, &E[i]); 
+		if (collision){
+			for(j = 0; j < numberOfE; j++){//grab a temp copy of the enemy array
+				tempE[j] = E[j];
+			}
+
+			for(j = i; j < numberOfE; j++){
+				E[j] = tempE[j+1];
+				
+			}
+			numberOfE -= 1;
+		}
+	}
+
 	for(i = 0; i < numberOfE; i++){//check enemy sprite collisions
 		for(j = 1; j < numberOfE; j++){
 			collision = check_collision(&E[i], &E[i+j]); 
-			// change the BG color, if sprites are touching
 			if(collision){
 				E[j].y++;//move it down
 			}
@@ -402,7 +417,7 @@ void win(void){
 
 void loadRoomData(void){
 	if(which_bg == 9) {numberOfE = 0;}
-	else{numberOfE = 2;}
+	else{numberOfE = 3;}
 }
 
 void updateStamina(void){
@@ -419,12 +434,14 @@ void updateStamina(void){
 void aBtn(void){//attack
 	if(pad1_new & PAD_A ){
 		if(stamina >= 1){
+			stamina-=1;
 			switch(dir){
 				case 1:
 				playerSprite=upAttSprite;
 				swordSpr=srdU;
 				sword.y = knight.y-8;
 				sword.x = knight.x;
+				testCollision();
 				wait(swdTime);
 				playerSprite=upSprite;
 				break;
@@ -433,6 +450,7 @@ void aBtn(void){//attack
 				swordSpr=srdR;
 				sword.x = knight.x+16;
 				sword.y = knight.y;
+				testCollision();
 				wait(swdTime);
 				playerSprite=rightSprite;
 				break;
@@ -441,6 +459,7 @@ void aBtn(void){//attack
 				swordSpr=srdD;
 				sword.y = knight.y+16;
 				sword.x = knight.x;
+				testCollision();
 				wait(swdTime);
 				playerSprite=downSprite;
 				break;
@@ -449,12 +468,14 @@ void aBtn(void){//attack
 				swordSpr=srdL;
 				sword.x = knight.x-8;
 				sword.y = knight.y;
+				testCollision();
 				wait(swdTime);
 				playerSprite=leftSprite;
 				break;
 			}
 			swordSpr=null;
-			stamina-=1;
+			sword.x = 0;//move it so enemies can't collide
+			sword.y = 0;
 			//still need to draw rest of blade
 		}
 	}
@@ -577,5 +598,6 @@ void wait(time){
 //Player Heal //DONE 
 //Enemy Random Spawn//DONE
 //Better Enemy Attack
+//fix attack sprite flickering - either flicker the sprites properly / shrink the sprites / stop enemies walking into a row with > 2 enemies in it 
 //Boss Fight
 //Better room load //DONE
