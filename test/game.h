@@ -2,6 +2,7 @@
 #include "BG/maps.c" 
 
 
+
 // GLOBAL VARIABLES
 // all variables should be global for speed  //I'm sorry Marius
 // zeropage global is even faster
@@ -46,6 +47,7 @@ int canMove = 1;
 int flasks = 3;
 int swdTime = 5;
 
+int respawnPos = 0;
 
  struct hollow { //basic entity
 	unsigned char x;
@@ -61,12 +63,29 @@ int numberOfE = 3; // Can't use value for creating an array
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 struct hollow tempE[3];
 
-struct hollow winBlock = {120, 112, 15, 7};
-struct hollow wolf = {120, 200, 32, 24};//BOSS 1
+struct hollow bonfire = {120, 112, 15, 7};
 
+struct hollow winBlock = {120, 112, 15, 7};
+
+struct boss { //basic entity
+	unsigned char x;
+	unsigned char y;
+	unsigned char width;
+	unsigned char height;
+	unsigned int health;
+	unsigned int maxHth;
+};
+struct boss wolf = {120, 100, 32, 24, 10, 10};//BOSS 1
+const unsigned char *wolfSpr = wolfL;
+unsigned int wolfCharge = 50;
+unsigned int wolfChX;
+unsigned int wolfChY;
+unsigned int dx;
+unsigned int dy;
+unsigned int squ;
 unsigned char c_map[240];
 // collision map 
-const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4,map5,map6,map7,map8,winRoom};//add the maps to the array
+const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4,map5,map6,map7,map8,fireRoom,wolfRoom,map11,map12};//add the maps to the array
 
 
 //Prototypes
@@ -89,6 +108,10 @@ void aBtn(void);
 void bBtn(void);
 void eBgCol(void);
 void wait(int time);
+void eMove(void);
+void wolfMove(void);
+void rest(void);
+
 
 char mapTiles[]={ //per row TTL, TR, BL, BR, Colour 
 	0, 0, 0, 0,  0,//Empty Space

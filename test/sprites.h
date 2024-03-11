@@ -90,9 +90,15 @@ const unsigned char hollowSprite[]={
 };
 
 
-const unsigned char fire[]={
+const unsigned char winSpr[]={
 	  0,  0,0x81,2,
 	  8,  0,0x82,2,
+	128
+};
+
+const unsigned char fireSpr[]={
+	  0,  0,0x91,2,
+	  8,  0,0x92,2,
 	128
 };
 
@@ -178,5 +184,5 @@ const  char paletteSp[]={//palette for the sprites
 PINK, DK_GY, BLUE, BROWN,
 WHITE,0x16,0x19,0x00,
 0,0x26,0x06,0x16,
-0,0,0,0
+BLACK,0x00,0x10,0x30
 }; 

@@ -26,6 +26,7 @@ void main (void) {
 	set_scroll_y(0xff); //shift the bg down 1 pixel
 	
 	mapPos = center; //setting the mapPos to the center of map
+	respawnPos = center;
 	regenTimer = timerSpeed;
 	playerSprite = downSprite;
 	
@@ -54,6 +55,8 @@ void main (void) {
 		loseCheck();
 		aBtn();
 		bBtn();
+
+		eMove();
 		
 		if (iFrame > 0){
 				iFrame -= 1;
@@ -76,11 +79,14 @@ void main (void) {
 void move (void){
 	if(roll){
 		knight.x += rHVal;
-		knight.y += rVVal;
+		
 
 		bgCollision();//cant roll through walls
 		if(collision_R) knight.x -= 3;
 		if(collision_L) knight.x += 3;
+
+		knight.y += rVVal;
+		bgCollision();
 		if(collision_D) knight.y -= 3;
 		if(collision_U) knight.y += 3;
 	}
@@ -134,12 +140,20 @@ void drawSprites(void){
 	{oam_meta_spr(knight.x, knight.y, playerSprite);}
 	oam_meta_spr(sword.x, sword.y, swordSpr);
 	
-	if(which_bg == 9){
-		oam_meta_spr(winBlock.x, winBlock.y , fire);
-	}else{
+	if(wolf.health <= 0){
+		oam_meta_spr(winBlock.x, winBlock.y , winSpr);
+	}
+	else if(which_bg == 10){
+		oam_meta_spr(wolf.x, wolf.y , wolfSpr);
+	}
+	else{
 		for(i = 0; i < numberOfE; i++){
 			oam_meta_spr(E[i].x, E[i].y , hollowSprite);
 		}
+	}
+
+	if(which_bg == 9){
+		oam_meta_spr(bonfire.x, bonfire.y , fireSpr);
 	}
 	
 }
@@ -149,7 +163,7 @@ void testCollision(void){//tests collisions against sprites
 		collision = check_collision(&knight, &E[i]); 
 		// change the BG color, if sprites are touching
 		if (collision){
-			E[i].y++;
+			//E[i].y++;
 			
 			if (iFrame <= 0 && roll == 0){
 				health -= 1;
@@ -176,6 +190,8 @@ void testCollision(void){//tests collisions against sprites
 		}
 	}
 
+	
+
 	for(i = 0; i < numberOfE; i++){//check enemy sprite collisions
 		for(j = 1; j < numberOfE; j++){
 			collision = check_collision(&E[i], &E[i+j]); 
@@ -185,12 +201,31 @@ void testCollision(void){//tests collisions against sprites
 			
 		}
 	}
-	if(which_bg == 9){
+	if(wolf.health <= 0){
 		collision = check_collision(&knight, &winBlock);
 		 if (collision){win();}
+	}else
+	if((which_bg == 10) && (wolf.health > 0)){//boss wolf
+		
+		collision = check_collision(&knight, &wolf);
+		 if (collision){if (iFrame <= 0 && roll == 0){
+				health -= 1;
+				iFrame = 26;
+				
+			}}
+
+		collision = check_collision(&sword, &wolf); 
+		if (collision){
+			wolf.health -= 1;
+			if(wolf.health <= 0){
+				wolfSpr = null;
+			}
+		}
+	}else if(which_bg == 9){
+		collision = check_collision(&knight, &bonfire); 
+		if (collision){rest();}
 	}
 }
-
 
 void draw_bg(void){
 	mapTiles[35] = 48+flasks; //Update the mapTiles to have the correct number of flasks
@@ -330,8 +365,9 @@ void loseCheck(void){//
 		pal_fade_to(4,0); // fade to black
 		ppu_off(); // screen off //make this better and fade in/out after saying you died
 		clearScreen();
-		which_bg = 0;
-		mapPos = center;
+		//which_bg = respawn;
+		mapPos = respawnPos;
+		which_bg = worldMap[mapPos];
 		
 		draw_bg();
 		health = maxHealth;
@@ -340,6 +376,7 @@ void loseCheck(void){//
 		knight.y = 112;
 		flasks = 3;
 		roll = 0;
+		wolf.health = wolf.maxHth; //Remove for multiple bosses
 		dir = 3;
 		playerSprite = downSprite;
 		ppu_wait_nmi();
@@ -416,8 +453,7 @@ void win(void){
 }
 
 void loadRoomData(void){
-	if(which_bg == 9) {numberOfE = 0;}
-	else{numberOfE = 3;}
+	numberOfE = eMap[mapPos];
 }
 
 void updateStamina(void){
@@ -432,7 +468,7 @@ void updateStamina(void){
 }
 
 void aBtn(void){//attack
-	if(pad1_new & PAD_A ){
+	if((pad1_new & PAD_A)&& (!roll) ){
 		if(stamina >= 1){
 			stamina-=1;
 			switch(dir){
@@ -487,7 +523,7 @@ void bBtn(void){//roll
 				stamina -= 1;
 				roll = 1;
 				playerSprite = rollSprite;
-				iFrame = 18;
+				iFrame = 26;
 				
 			}
 	}
@@ -512,7 +548,7 @@ void stBtn(void){//heal
 	}	
 }
 
-void selBtn(void){//menu //Currently Pause //ignore that currently testing
+void selBtn(void){//menu //Currently Pause 
 	if(pad1_new & PAD_SELECT){
 		if (pause == 0){
 			pause = 1;
@@ -574,10 +610,10 @@ void eBgCol(void){
 		}
 
 
-		if(collision_D) E[i].y -= 2;
-		if(collision_U) E[i].y += 2;
-		if(collision_L) E[i].x += 2;
-		if(collision_R) E[i].x -= 2;
+		if(collision_D) E[i].y -= 1;
+		if(collision_U) E[i].y += 1;
+		if(collision_L) E[i].x += 1;
+		if(collision_R) E[i].x -= 1;
 	}
 };
 
@@ -588,16 +624,77 @@ void wait(time){
 		updateHealth();
 		updateStamina();
 		ppu_wait_nmi();
+		eMove();
+		eBgCol();
 		time -= 1;
 	}
 }
 
+void eMove(void){//Basic Move towards player - it is bad, but usable
+	for(i = 0; i < numberOfE; i++){
+		if(E[i].x > knight.x){
+			E[i].x -= 1;
+		}
+		if(E[i].x < knight.x){
+			E[i].x += 1;
+		}
+		if(E[i].y > knight.y){
+			E[i].y -= 1;
+		}
+		if(E[i].y < knight.y){
+			E[i].y += 1;
+		}
+	}
+
+	if((which_bg == 10) && (wolf.health > 0)){wolfMove();}
+}
+
+void wolfMove(void){//wolf Boss attack
+
+
+	if (wolfCharge >= 35){//charging
+		wolfCharge -= 1;
+		wolf.x += wolfChX;
+		if(wolf.x < 16){wolf.x = 16;}
+		else if(wolf.x > 208){wolf.x = 208;}
+		wolf.y += wolfChY;
+		if(wolf.y < 32){wolf.y = 32;}
+		else if(wolf.y > 200){wolf.y = 200;}
+
+
+
+	}else if (wolfCharge > 0){//waiting
+		wolfCharge -= 1;
+	}else{//start  new charge
+		wolfCharge = 60;
+
+		wolfChX = (knight.x - wolf.x)/10; //should really make the speed constistant regardless of distance, but I think this is funny so ¯\(-_-)/¯
+		wolfChY = (knight.y - wolf.y)/10;
+
+		if((knight.x - wolf.x) < 0){wolfSpr = wolfL;}else{wolfSpr = wolfR;}
+	}	
+}
+
+
+void rest(void){
+	respawnPos = mapPos;
+	flasks = 3;
+	health = maxHealth;
+	//update GUI
+	mapTiles[35] = 48+flasks; //Update the mapTiles to have the correct number of flasks
+	address = get_ppu_addr(0, 0xF0, 0); //Address of the flask
+	buffer_1_mt(address, 7);
+}
+
 //TODO - Minimum
 //Player Roll //DONE
-//Player Attack //Change enemy load first//Enemy load done
+//Player Attack //Change enemy load first//Enemy load done //Done
 //Player Heal //DONE 
 //Enemy Random Spawn//DONE
-//Better Enemy Attack
-//fix attack sprite flickering - either flicker the sprites properly / shrink the sprites / stop enemies walking into a row with > 2 enemies in it 
-//Boss Fight
+//Stop animation canceling on roll //DONE
+//Better Enemy Attack //GOOD ENOUGH
+//fix attack sprite flickering - either flicker the sprites properly / shrink the sprites / stop enemies walking into a row with > 2 enemies in it //FIX LATER
+//Boss Fight//DONE KINDA
 //Better room load //DONE
+
+//ROLL through corners bug... DONE
