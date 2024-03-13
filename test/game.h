@@ -57,7 +57,7 @@ int respawnPos = 0;
 };
 
 
-struct hollow knight = {40,62,15,15};
+struct hollow knight = {120,94,15,15};
 struct hollow sword = {0, 0, 15, 15};
 int numberOfE = 3; // Can't use value for creating an array 
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
@@ -116,9 +116,9 @@ void rest(void);
 char mapTiles[]={ //per row TTL, TR, BL, BR, Colour 
 	0, 0, 0, 0,  0,//Empty Space
 	2, 2, 2, 2,  0,//Tiles
-	3, 3, 3, 3,  0,
-	0, 0, 0, 0,  0,
-	0, 0, 0, 0,  0,
+	3, 3, 3, 3,  0,//1 colour
+	0, 0, 0, 0,  0,//Empty Space - Solid
+	131, 132, 147, 148,  1,//Tree
 	0, 0, 0, 0,  0,
 	0, 0, 0, 0,  0,
 	48, 130, 0, 0,  1 //Flask

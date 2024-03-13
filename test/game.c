@@ -152,7 +152,7 @@ void drawSprites(void){
 		}
 	}
 
-	if(which_bg == 9){
+	if(iMap[mapPos] == 1){
 		oam_meta_spr(bonfire.x, bonfire.y , fireSpr);
 	}
 	
@@ -221,7 +221,7 @@ void testCollision(void){//tests collisions against sprites
 				wolfSpr = null;
 			}
 		}
-	}else if(which_bg == 9){
+	}else if(iMap[mapPos] == 1){
 		collision = check_collision(&knight, &bonfire); 
 		if (collision){rest();}
 	}
@@ -389,10 +389,12 @@ void loseCheck(void){//
 void nextRoom(void){ //currently just iterates the background - need to change to follow a proper map.
 	if(knight.y < 13){
 		pal_fade_to(4,0); // fade to black
+		
 		knight.y = 221;
 		mapPos -= mapWidth;
 		which_bg = worldMap[mapPos];
 		//draw_bg();
+		
 		draw_bg();
 		drawSprites();
 		ppu_wait_nmi();
@@ -454,6 +456,7 @@ void win(void){
 
 void loadRoomData(void){
 	numberOfE = eMap[mapPos];
+	
 }
 
 void updateStamina(void){
@@ -670,8 +673,9 @@ void wolfMove(void){//wolf Boss attack
 
 		wolfChX = (knight.x - wolf.x)/10; //should really make the speed constistant regardless of distance, but I think this is funny so ¯\(-_-)/¯
 		wolfChY = (knight.y - wolf.y)/10;
-
-		if((knight.x - wolf.x) < 0){wolfSpr = wolfL;}else{wolfSpr = wolfR;}
+		
+		
+		if((knight.x - wolf.x) < 0){wolfSpr = wolfL;}else{wolfSpr = wolfR;}//change sprite direction
 	}	
 }
 
