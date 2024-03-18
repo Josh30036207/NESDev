@@ -140,10 +140,10 @@ void drawSprites(void){
 	{oam_meta_spr(knight.x, knight.y, playerSprite);}
 	oam_meta_spr(sword.x, sword.y, swordSpr);
 	
-	if(wolf.health <= 0){
+	if( which_bg == 13 && wolf.health <= 0){//which_bg == 13 is temp as only 1 boss
 		oam_meta_spr(winBlock.x, winBlock.y , winSpr);
 	}
-	else if(which_bg == 10){
+	else if(bossType == 'W'){
 		oam_meta_spr(wolf.x, wolf.y , wolfSpr);
 	}
 	else{
@@ -205,7 +205,7 @@ void testCollision(void){//tests collisions against sprites
 		collision = check_collision(&knight, &winBlock);
 		 if (collision){win();}
 	}else
-	if((which_bg == 10) && (wolf.health > 0)){//boss wolf
+	if((bossType == 'W') && (wolf.health > 0)){//boss wolf
 		
 		collision = check_collision(&knight, &wolf);
 		 if (collision){if (iFrame <= 0 && roll == 0){
@@ -219,7 +219,29 @@ void testCollision(void){//tests collisions against sprites
 			wolf.health -= 1;
 			if(wolf.health <= 0){
 				wolfSpr = null;
+				
+				drawSprites();
+				i = 0;
+				do{
+					ppu_wait_nmi();
+					i++;
+				}while(i <= 35);
+				// //open up boss gates
+				canLeave = 1;
+				worldMap[mapPos] = 13;
+				which_bg = worldMap[mapPos];
+				eMap[mapPos] = 0;
+				pal_fade_to(4,0); // fade to black
+				i = 0;
+				do{
+					ppu_wait_nmi();
+					i++;
+				}while(i <= 30);
+				draw_bg();
+				pal_fade_to(0,4); // back to normal brightness	
 			}
+				
+		
 		}
 	}else if(iMap[mapPos] == 1){
 		collision = check_collision(&knight, &bonfire); 
@@ -376,7 +398,8 @@ void loseCheck(void){//
 		knight.y = 112;
 		flasks = 3;
 		roll = 0;
-		wolf.health = wolf.maxHth; //Remove for multiple bosses
+		if(wolf.health > 0){wolf.health = wolf.maxHth;} //Remove for multiple bosses
+		canLeave = 1;
 		dir = 3;
 		playerSprite = downSprite;
 		ppu_wait_nmi();
@@ -386,59 +409,78 @@ void loseCheck(void){//
 	}
 }
 
-void nextRoom(void){ //currently just iterates the background - need to change to follow a proper map.
-	if(knight.y < 13){
-		pal_fade_to(4,0); // fade to black
+void nextRoom(void){ 
+	if(canLeave){
+		if(knight.y < 13){
+			pal_fade_to(4,0); // fade to black
+			
+			knight.y = 221;
+			mapPos -= mapWidth;
+			which_bg = worldMap[mapPos];
+			//draw_bg();
+			
+			draw_bg();
+			drawSprites();
+			ppu_wait_nmi();
+			pal_bright(4); // back to normal brightness	
+			
+		}
+		else if(knight.y > 221){
+			pal_fade_to(4,0); // fade to black
+			knight.y = 13;
+			mapPos += mapWidth;
+			which_bg = worldMap[mapPos];
+			//draw_bg();
+			draw_bg();
+			drawSprites();
+			ppu_wait_nmi();
+			pal_bright(4); // back to normal brightness	
+			
+		}
+		else if(knight.x <= 3 ){
+			pal_fade_to(4,0); // fade to black
+			knight.x = 236;
+			mapPos=mapPos-1;
+			which_bg = worldMap[mapPos];
+			//draw_bg();
+			draw_bg();
+			drawSprites();
+			ppu_wait_nmi();
+			pal_bright(4); // back to normal brightness	
+			
+		}
+		else if(knight.x >= 237){
+			pal_fade_to(4,0); // fade to black
+			knight.x = 4;//can't go less than 0, so have to be a pixel over
+			mapPos=mapPos+1;
+			which_bg = worldMap[mapPos];
+			//draw_bg();
+			draw_bg();
+			drawSprites();
+			ppu_wait_nmi();
+			pal_bright(4); // back to normal brightness	
+			
+		}
 		
-		knight.y = 221;
-		mapPos -= mapWidth;
-		which_bg = worldMap[mapPos];
-		//draw_bg();
-		
-		draw_bg();
-		drawSprites();
-		ppu_wait_nmi();
-		pal_bright(4); // back to normal brightness	
-		
+	}else{
+		if(knight.y < 32){
+			knight.y += 4;
+			
+			
+		}
+		else if(knight.y > 208){
+			knight.y -= 4;
+			
+		}
+		else if(knight.x < 16 ){
+			knight.x += 4;
+			
+		}
+		else if(knight.x > 224){
+			knight.x -= 4;
+			
+		}
 	}
-	else if(knight.y > 221){
-		pal_fade_to(4,0); // fade to black
-		knight.y = 13;
-		mapPos += mapWidth;
-		which_bg = worldMap[mapPos];
-		//draw_bg();
-		draw_bg();
-		drawSprites();
-		ppu_wait_nmi();
-		pal_bright(4); // back to normal brightness	
-		
-	}
-	else if(knight.x <= 3 ){
-		pal_fade_to(4,0); // fade to black
-		knight.x = 236;
-		mapPos=mapPos-1;
-		which_bg = worldMap[mapPos];
-		//draw_bg();
-		draw_bg();
-		drawSprites();
-		ppu_wait_nmi();
-		pal_bright(4); // back to normal brightness	
-		
-	}
-	else if(knight.x >= 237){
-		pal_fade_to(4,0); // fade to black
-		knight.x = 4;//can't go less than 0, so have to be a pixel over
-		mapPos=mapPos+1;
-		which_bg = worldMap[mapPos];
-		//draw_bg();
-		draw_bg();
-		drawSprites();
-		ppu_wait_nmi();
-		pal_bright(4); // back to normal brightness	
-		
-	}
-	
-	
 }
 
 void win(void){
@@ -455,7 +497,9 @@ void win(void){
 }
 
 void loadRoomData(void){
-	numberOfE = eMap[mapPos];
+	if( eMap[mapPos] >= 0 && eMap[mapPos] <= 9 ){numberOfE = eMap[mapPos]; bossType = 0; }
+	else{bossType = eMap[mapPos]; numberOfE = 0; canLeave = 0;}
+
 	
 }
 
@@ -521,7 +565,7 @@ void aBtn(void){//attack
 }
 
 void bBtn(void){//roll
-	if(pad1_new & PAD_B){
+	if(pad1_new & PAD_B && (!roll)){
 		if (stamina >= 1){
 				stamina -= 1;
 				roll = 1;
@@ -529,6 +573,8 @@ void bBtn(void){//roll
 				iFrame = 26;
 				
 			}
+
+		
 	}
 
 	
@@ -547,7 +593,7 @@ void stBtn(void){//heal
 		address = get_ppu_addr(0, 0xF0, 0); //Address of the flask
 		buffer_1_mt(address, 7); // redraw just the flasks - no need to update entire screen + doesn't require the screen to be turned off
 		
-
+		
 	}	
 }
 
@@ -649,7 +695,9 @@ void eMove(void){//Basic Move towards player - it is bad, but usable
 		}
 	}
 
-	if((which_bg == 10) && (wolf.health > 0)){wolfMove();}
+	if(bossType == 'W' && wolf.health > 0){wolfMove();}
+		
+	
 }
 
 void wolfMove(void){//wolf Boss attack
@@ -677,6 +725,8 @@ void wolfMove(void){//wolf Boss attack
 		
 		if((knight.x - wolf.x) < 0){wolfSpr = wolfL;}else{wolfSpr = wolfR;}//change sprite direction
 	}	
+
+	
 }
 
 

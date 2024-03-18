@@ -176,7 +176,7 @@ const unsigned char srdL[]={
 
 const  char paletteBg[]={ //palette for the background
 BLACK, DK_GY, BLUE, 0x16,
-0,0x17,0x06,0x27,
+0,0x10,0x06,0x27,
 0,0,0,0,
 0,0,0,0
 }; 
@@ -186,3 +186,14 @@ BLACK,0x16,0x19,0x00,
 BLACK,0x06,BROWN,0x27,
 BLACK,0x00,0x10,0x30
 }; 
+
+char mapTiles[]={ //per row TTL, TR, BL, BR, Colour 
+	0, 0, 0, 0,  0,//Empty Space
+	2, 2, 2, 2,  0,//Tiles
+	3, 3, 3, 3,  1,//1 colour
+	0, 0, 0, 0,  0,//Empty Space - Solid
+	131, 132, 147, 148,  1,//Tree
+	0, 0, 0, 0,  0,
+	0, 0, 0, 0,  0,
+	48, 130, 0, 0,  1 //Flask
+};

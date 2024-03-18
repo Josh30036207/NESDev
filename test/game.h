@@ -46,6 +46,7 @@ int dir = 3;
 int canMove = 1;
 int flasks = 3;
 int swdTime = 5;
+int canLeave = 1;
 
 int respawnPos = 0;
 
@@ -60,6 +61,7 @@ int respawnPos = 0;
 struct hollow knight = {120,94,15,15};
 struct hollow sword = {0, 0, 15, 15};
 int numberOfE = 3; // Can't use value for creating an array 
+unsigned char bossType;
 struct hollow E[3]; //Maximum of 3 enemies per row, prob don't want more than that anyway
 struct hollow tempE[3];
 
@@ -85,7 +87,7 @@ unsigned int dy;
 unsigned int squ;
 unsigned char c_map[240];
 // collision map 
-const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4,map5,map6,map7,map8,fireRoom,wolfRoom,map11,map12};//add the maps to the array
+const unsigned char * const All_Collision_Maps[] = {map0, map1,map2,map3,map4,map5,map6,map7,map8,fireRoom,wolfRoom,map11,map12,wolfRoomOpn};//add the maps to the array
 
 
 //Prototypes
@@ -113,16 +115,7 @@ void wolfMove(void);
 void rest(void);
 
 
-char mapTiles[]={ //per row TTL, TR, BL, BR, Colour 
-	0, 0, 0, 0,  0,//Empty Space
-	2, 2, 2, 2,  0,//Tiles
-	3, 3, 3, 3,  0,//1 colour
-	0, 0, 0, 0,  0,//Empty Space - Solid
-	131, 132, 147, 148,  1,//Tree
-	0, 0, 0, 0,  0,
-	0, 0, 0, 0,  0,
-	48, 130, 0, 0,  1 //Flask
-};
+
 
 // bg draw variables
 int address;
